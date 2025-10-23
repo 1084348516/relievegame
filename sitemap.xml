@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    <!-- Bubble Pop Game - Main Domain -->
+    <url>
+        <loc>https://www.relievegame.space/</loc>
+        <lastmod>2025-10-23</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+
+    <!-- Alternative URL (non-www) -->
+    <url>
+        <loc>https://relievegame.space/</loc>
+        <lastmod>2025-10-23</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+
+</urlset>
