@@ -60,45 +60,91 @@
         .subtitle {
             text-align: center;
             color: #888;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-size: 0.9em;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 12px 24px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
 
         .stats {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 30px;
-            gap: 20px;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         .stat-box {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
+            padding: 15px 20px;
             border-radius: 15px;
             text-align: center;
             flex: 1;
+            min-width: 120px;
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
         .stat-label {
-            font-size: 0.8em;
+            font-size: 0.75em;
             opacity: 0.9;
             margin-bottom: 5px;
         }
 
         .stat-value {
-            font-size: 2em;
+            font-size: 1.8em;
             font-weight: bold;
+        }
+
+        .target-display {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .target-display.hidden {
+            display: none;
         }
 
         .bubble-area {
             position: relative;
             width: 100%;
-            height: 500px;
+            height: 450px;
             background: linear-gradient(to bottom, #e0f7ff, #f0f8ff);
             border-radius: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             overflow: hidden;
             box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
         }
@@ -133,25 +179,33 @@
         }
 
         .bubble.popped {
-            animation: pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: pop 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67);
         }
 
         @keyframes pop {
             0% {
                 transform: scale(1) rotate(0deg);
                 opacity: 1;
+                filter: brightness(1);
             }
-            25% {
-                transform: scale(1.3) rotate(5deg);
-                opacity: 0.9;
+            20% {
+                transform: scale(1.4) rotate(8deg);
+                opacity: 1;
+                filter: brightness(1.5);
             }
-            50% {
-                transform: scale(1.5) rotate(-5deg);
-                opacity: 0.6;
+            40% {
+                transform: scale(1.6) rotate(-8deg);
+                opacity: 0.8;
+                filter: brightness(1.8);
             }
-            75% {
-                transform: scale(1.2) rotate(3deg);
-                opacity: 0.3;
+            60% {
+                transform: scale(0.8) rotate(5deg);
+                opacity: 0.5;
+                filter: brightness(1.2);
+            }
+            80% {
+                transform: scale(0.3) rotate(-3deg);
+                opacity: 0.2;
             }
             100% {
                 transform: scale(0) rotate(0deg);
@@ -161,20 +215,46 @@
 
         .bubble-particle {
             position: absolute;
-            width: 8px;
-            height: 8px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             pointer-events: none;
-            animation: particle-burst 0.8s ease-out forwards;
+            animation: particle-burst 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
         }
 
         @keyframes particle-burst {
             0% {
-                transform: translate(0, 0) scale(1);
+                transform: translate(0, 0) scale(1) rotate(0deg);
                 opacity: 1;
             }
+            50% {
+                transform: translate(calc(var(--tx) * 0.6), calc(var(--ty) * 0.6)) scale(1.2) rotate(180deg);
+                opacity: 0.8;
+            }
             100% {
-                transform: translate(var(--tx), var(--ty)) scale(0);
+                transform: translate(var(--tx), var(--ty)) scale(0) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .bubble-ring {
+            position: absolute;
+            border: 3px solid;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: ring-expand 0.6s ease-out forwards;
+        }
+
+        @keyframes ring-expand {
+            0% {
+                width: 60px;
+                height: 60px;
+                opacity: 0.8;
+            }
+            100% {
+                width: 120px;
+                height: 120px;
                 opacity: 0;
             }
         }
@@ -221,6 +301,55 @@
             transform: translateY(0);
         }
 
+        .game-over-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .game-over-modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .modal-content h2 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            font-size: 1.3em;
+            margin: 10px 0;
+            color: #333;
+        }
+
+        .modal-btn {
+            margin-top: 20px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
         @media (max-width: 600px) {
             h1 {
                 font-size: 2em;
@@ -231,7 +360,7 @@
             }
 
             .bubble-area {
-                height: 400px;
+                height: 350px;
             }
 
             .bubble {
@@ -245,23 +374,39 @@
 <div class="container">
     <header>
         <h1>🫧 Bubble Pop</h1>
-        <p class="subtitle">Click the bubbles to pop them and relax!</p>
+        <p class="subtitle">Choose your game mode and start popping!</p>
     </header>
+
+    <div class="mode-selector">
+        <button class="mode-btn active" data-mode="endless">♾️ Endless</button>
+        <button class="mode-btn" data-mode="timed">⏱️ Timed (60s)</button>
+        <button class="mode-btn" data-mode="target">🎯 Target</button>
+    </div>
+
+    <div id="targetDisplay" class="target-display hidden"></div>
 
     <div class="stats">
         <div class="stat-box">
-            <div class="stat-label">Popped</div>
-            <div class="stat-value" id="poppedCount">0</div>
+            <div class="stat-label">Score</div>
+            <div class="stat-value" id="scoreCount">0</div>
+        </div>
+        <div class="stat-box" id="timerBox" style="display: none;">
+            <div class="stat-label">Time Left</div>
+            <div class="stat-value" id="timerCount">60</div>
         </div>
         <div class="stat-box">
             <div class="stat-label">Active</div>
             <div class="stat-value" id="activeCount">0</div>
         </div>
+        <div class="stat-box" id="highScoreBox">
+            <div class="stat-label">High Score</div>
+            <div class="stat-value" id="highScore">0</div>
+        </div>
     </div>
 
     <div class="bubble-area" id="bubbleArea"></div>
 
-    <button class="reset-btn" id="resetBtn">Clear All Bubbles</button>
+    <button class="reset-btn" id="resetBtn">Restart Game</button>
 
     <footer style="margin-top: 30px; text-align: center; color: #888; font-size: 0.85em;">
         <p>🧘 A free stress relief and anxiety reduction tool for mindfulness and relaxation</p>
@@ -269,16 +414,60 @@
     </footer>
 </div>
 
+<div class="game-over-modal" id="gameOverModal">
+    <div class="modal-content">
+        <h2 id="modalTitle">🎉 Game Over!</h2>
+        <p id="modalMessage"></p>
+        <p style="font-size: 2em; color: #667eea; margin: 20px 0;" id="finalScore"></p>
+        <button class="modal-btn" id="playAgainBtn">Play Again</button>
+    </div>
+</div>
+
 <script>
     const colors = [
-        '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A',
-        '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2',
-        '#F8B88B', '#FAD7A0', '#AED6F1', '#D7BDE2'
+        { name: 'Red', hex: '#FF6B6B' },
+        { name: 'Cyan', hex: '#4ECDC4' },
+        { name: 'Blue', hex: '#45B7D1' },
+        { name: 'Orange', hex: '#FFA07A' },
+        { name: 'Green', hex: '#98D8C8' },
+        { name: 'Yellow', hex: '#F7DC6F' },
+        { name: 'Purple', hex: '#BB8FCE' },
+        { name: 'Sky', hex: '#85C1E2' }
     ];
 
-    let popped = 0;
+    let gameMode = 'endless';
+    let score = 0;
     let activeBubbles = 0;
-    const maxBubbles = 30;
+    let maxBubbles = 30;
+    let generationInterval = null;
+    let timerInterval = null;
+    let timeLeft = 60;
+    let targetColor = null;
+    let targetCount = 30;
+    let targetProgress = 0;
+    let highScores = {
+        endless: 0,
+        timed: 0,
+        target: 0
+    };
+
+    // Load high scores
+    const savedScores = localStorage.getItem('bubblePopHighScores');
+    if (savedScores) {
+        highScores = JSON.parse(savedScores);
+    }
+
+    function updateHighScore() {
+        document.getElementById('highScore').textContent = highScores[gameMode];
+    }
+
+    function saveHighScore() {
+        if (score > highScores[gameMode]) {
+            highScores[gameMode] = score;
+            localStorage.setItem('bubblePopHighScores', JSON.stringify(highScores));
+            updateHighScore();
+        }
+    }
 
     function getRandomPosition() {
         const area = document.getElementById('bubbleArea');
@@ -309,7 +498,7 @@
         return false;
     }
 
-    function addNewBubble() {
+    function addNewBubble(forceColor = null) {
         if (activeBubbles >= maxBubbles) return;
 
         let position;
@@ -323,7 +512,10 @@
         const area = document.getElementById('bubbleArea');
         const bubble = document.createElement('div');
         bubble.className = 'bubble appearing';
-        bubble.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+        const colorObj = forceColor || colors[Math.floor(Math.random() * colors.length)];
+        bubble.style.backgroundColor = colorObj.hex;
+        bubble.dataset.color = colorObj.name;
         bubble.style.left = position.x + 'px';
         bubble.style.top = position.y + 'px';
 
@@ -331,21 +523,28 @@
             if (!this.classList.contains('popped')) {
                 this.classList.add('popped');
 
-                // Create particle effect
                 const bubbleColor = this.style.backgroundColor;
-                const rect = this.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
+                const clickedColor = this.dataset.color;
 
-                for (let i = 0; i < 8; i++) {
+                // Create expanding ring effect
+                const ring = document.createElement('div');
+                ring.className = 'bubble-ring';
+                ring.style.borderColor = bubbleColor;
+                ring.style.left = (parseFloat(this.style.left)) + 'px';
+                ring.style.top = (parseFloat(this.style.top)) + 'px';
+                area.appendChild(ring);
+                setTimeout(() => ring.remove(), 600);
+
+                // Create particles
+                for (let i = 0; i < 12; i++) {
                     const particle = document.createElement('div');
                     particle.className = 'bubble-particle';
                     particle.style.backgroundColor = bubbleColor;
-                    particle.style.left = (parseFloat(this.style.left) + 25) + 'px';
-                    particle.style.top = (parseFloat(this.style.top) + 25) + 'px';
+                    particle.style.left = (parseFloat(this.style.left) + 24) + 'px';
+                    particle.style.top = (parseFloat(this.style.top) + 24) + 'px';
 
-                    const angle = (i / 8) * Math.PI * 2;
-                    const distance = 60 + Math.random() * 40;
+                    const angle = (i / 12) * Math.PI * 2;
+                    const distance = 80 + Math.random() * 50;
                     const tx = Math.cos(angle) * distance;
                     const ty = Math.sin(angle) * distance;
 
@@ -353,17 +552,31 @@
                     particle.style.setProperty('--ty', ty + 'px');
 
                     area.appendChild(particle);
-
-                    setTimeout(() => particle.remove(), 800);
+                    setTimeout(() => particle.remove(), 1000);
                 }
 
-                popped++;
+                // Update score based on mode
+                if (gameMode === 'target') {
+                    if (clickedColor === targetColor.name) {
+                        score += 10;
+                        targetProgress++;
+                        updateTargetDisplay();
+                        if (targetProgress >= targetCount) {
+                            endGame(true);
+                        }
+                    } else {
+                        score += 1;
+                    }
+                } else {
+                    score += 10;
+                }
+
                 activeBubbles--;
                 updateStats();
 
                 setTimeout(() => {
                     this.remove();
-                }, 600);
+                }, 500);
             }
         });
 
@@ -373,30 +586,159 @@
     }
 
     function updateStats() {
-        document.getElementById('poppedCount').textContent = popped;
+        document.getElementById('scoreCount').textContent = score;
         document.getElementById('activeCount').textContent = activeBubbles;
     }
 
-    function startAutoGeneration() {
-        setInterval(() => {
-            addNewBubble();
-        }, 1200);
+    function updateTargetDisplay() {
+        const display = document.getElementById('targetDisplay');
+        if (gameMode === 'target' && targetColor) {
+            display.innerHTML = `🎯 Pop ${targetCount - targetProgress} more <span style="color: ${targetColor.hex}; font-weight: bold;">${targetColor.name}</span> bubbles!`;
+            display.classList.remove('hidden');
+        } else {
+            display.classList.add('hidden');
+        }
     }
 
-    document.getElementById('resetBtn').addEventListener('click', function() {
+    function startTimer() {
+        timeLeft = 60;
+        document.getElementById('timerCount').textContent = timeLeft;
+        document.getElementById('timerBox').style.display = 'block';
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timerCount').textContent = timeLeft;
+
+            if (timeLeft <= 0) {
+                endGame(false);
+            }
+        }, 1000);
+    }
+
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        document.getElementById('timerBox').style.display = 'none';
+    }
+
+    function startGeneration() {
+        const speed = gameMode === 'timed' ? 800 : 1200;
+        generationInterval = setInterval(() => {
+            if (gameMode === 'target' && targetColor) {
+                // 50% chance to generate target color
+                const forceTarget = Math.random() < 0.5;
+                addNewBubble(forceTarget ? targetColor : null);
+            } else {
+                addNewBubble();
+            }
+        }, speed);
+    }
+
+    function stopGeneration() {
+        if (generationInterval) {
+            clearInterval(generationInterval);
+            generationInterval = null;
+        }
+    }
+
+    function clearBubbles() {
         const area = document.getElementById('bubbleArea');
         area.innerHTML = '';
-        popped = 0;
         activeBubbles = 0;
-        updateStats();
-    });
-
-    // Generate initial bubbles
-    for (let i = 0; i < 10; i++) {
-        setTimeout(() => addNewBubble(), i * 200);
     }
 
-    startAutoGeneration();
+    function endGame(isWin) {
+        stopGeneration();
+        stopTimer();
+        saveHighScore();
+
+        const modal = document.getElementById('gameOverModal');
+        const title = document.getElementById('modalTitle');
+        const message = document.getElementById('modalMessage');
+        const finalScore = document.getElementById('finalScore');
+
+        if (gameMode === 'target') {
+            if (isWin) {
+                title.textContent = '🎉 Victory!';
+                message.textContent = `You completed the target!`;
+            } else {
+                title.textContent = '⏰ Time\'s Up!';
+                message.textContent = `You popped ${targetProgress}/${targetCount} target bubbles`;
+            }
+        } else if (gameMode === 'timed') {
+            title.textContent = '⏰ Time\'s Up!';
+            message.textContent = `Great job!`;
+        }
+
+        finalScore.textContent = `Final Score: ${score}`;
+        modal.classList.add('show');
+    }
+
+    function startGame(mode) {
+        gameMode = mode;
+        score = 0;
+        targetProgress = 0;
+        clearBubbles();
+        stopGeneration();
+        stopTimer();
+        updateStats();
+        updateHighScore();
+
+        // Hide modal
+        document.getElementById('gameOverModal').classList.remove('show');
+
+        // Update mode buttons
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.mode === mode) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Start based on mode
+        if (mode === 'timed') {
+            startTimer();
+            maxBubbles = 35;
+        } else if (mode === 'target') {
+            targetColor = colors[Math.floor(Math.random() * colors.length)];
+            targetCount = 30;
+            targetProgress = 0;
+            updateTargetDisplay();
+            maxBubbles = 30;
+        } else {
+            maxBubbles = 30;
+            updateTargetDisplay();
+        }
+
+        // Generate initial bubbles
+        for (let i = 0; i < 10; i++) {
+            setTimeout(() => addNewBubble(), i * 200);
+        }
+
+        startGeneration();
+    }
+
+    // Mode selector
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            startGame(this.dataset.mode);
+        });
+    });
+
+    // Reset button
+    document.getElementById('resetBtn').addEventListener('click', function() {
+        startGame(gameMode);
+    });
+
+    // Play again button
+    document.getElementById('playAgainBtn').addEventListener('click', function() {
+        startGame(gameMode);
+    });
+
+    // Start with endless mode
+    startGame('endless');
 
     // Console welcome message
     console.log('%c🫧 Bubble Pop - Stress Relief Game', 'color: #667eea; font-size: 20px; font-weight: bold;');
