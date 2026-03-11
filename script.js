@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const undoButton = document.getElementById('undo-button');
     const holdArea = document.getElementById('hold-area');
     const levelDisplay = document.getElementById('level-display');
+    const leaderboardList = document.getElementById('leaderboard-list');
 
     const cardTypes = ['🐑', '🐔', '🐷', '🐮', '🐰', '🐶', '🐱', '🐻', '🐼', '🐨', '🐯', '🦁', '🐸', '🐵', '🦊', '🐴', '🦄', '🦓', '🦉', '🦋', '🐢', '🐍', '🐳', '🐬', '🍎', '🍉', '🍌', '🍍', '🥕', '🥦'];
     let cards = [];
@@ -16,15 +17,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     function loadGame() {
-        const savedLevel = localStorage.getItem('sheepGameLevel');
+        const savedLevel = localStorage.getItem('tapGameLevel');
         if (savedLevel) {
             level = parseInt(savedLevel, 10);
         }
+        fetchLeaderboard();
     }
 
     function saveGame() {
-        localStorage.setItem('sheepGameLevel', level);
+        localStorage.setItem('tapGameLevel', level);
     }
+
+    async function fetchLeaderboard() {
+        try {
+            const response = await fetch('http://8.138.186.187:8088/api/rank/top10');
+            const result = await response.json();
+            if (result.code === 200) {
+                leaderboardList.innerHTML = '';
+                result.data.forEach(player => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${player.playerName}</span> - ${player.countryName}`;
+                    leaderboardList.appendChild(li);
+                });
+            } else {
+                console.error('Failed to fetch leaderboard:', result.message);
+            }
+        } catch (error) {
+            console.error('Error fetching leaderboard:', error);
+        }
+    }
+
 
 
     function initGame() {
@@ -207,10 +229,42 @@ document.addEventListener('DOMContentLoaded', () => {
         checkWinOrLose();
     }
 
+    async function submitRank(playerName, countryName) {
+        try {
+            const response = await fetch('http://8.138.186.187:8088/api/rank', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ playerName, countryName }),
+            });
+            const result = await response.json();
+            if (result.code === 200) {
+                alert('Successfully submitted your rank!');
+                fetchLeaderboard(); // Refresh the leaderboard
+            } else {
+                alert(`Failed to submit rank: ${result.message}`);
+            }
+        } catch (error) {
+            console.error('Error submitting rank:', error);
+            alert('An error occurred while submitting your rank.');
+        }
+    }
+
     function checkWinOrLose() {
         if (cards.length === 0 && slots.length === 0) {
-            alert('Congratulations, you passed the level!');
-            level++;
+            if (level === 3) {
+                const playerName = prompt('Congratulations! You have cleared all levels! Please enter your name:');
+                const countryName = prompt('Please enter your country:');
+                if (playerName && countryName) {
+                    submitRank(playerName, countryName);
+                }
+                alert('You are a master of Tap Tap Tap!');
+                level = 1; // Reset to level 1
+            } else {
+                alert('Congratulations, you passed the level!');
+                level++;
+            }
             saveGame();
             initGame();
         } else if (slots.length >= 7) {

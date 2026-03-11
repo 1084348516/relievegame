@@ -7,24 +7,32 @@
     <meta name="description" content="Play Tap Tap Tap, a challenging and addictive tile-matching puzzle game. Test your strategy and speed by clearing the board. Can you beat all the levels?">
     <meta name="keywords" content="tap tap tap, puzzle game, matching game, tile matching, strategy game, brain teaser, online game, free game,relieve game,relieve,play game,game,Puzzle,Puzzle game,puzzle">
     <meta name="author" content="Bright">
-
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐑</text></svg>">
     
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Tap</h1>
-            <div id="level-display">Level: 1</div>
+    <div class="main-wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>Tap</h1>
+                <div id="level-display">Level: 1</div>
+            </div>
+            <div class="game-board" id="game-board"></div>
+            <div class="slot-area" id="slot-area"></div>
+            <div class="controls">
+                <button id="hold-button">Hold</button>
+                <button id="undo-button">Undo</button>
+                <button id="reset-button">Restart</button>
+            </div>
+            <div class="hold-area" id="hold-area"></div>
         </div>
-        <div class="game-board" id="game-board"></div>
-        <div class="slot-area" id="slot-area"></div>
-        <div class="controls">
-            <button id="hold-button">Hold</button>
-            <button id="undo-button">Undo</button>
-            <button id="reset-button">Restart</button>
+        <div class="leaderboard">
+            <h2>🏆 Hall of Fame 🏆</h2>
+            <ul id="leaderboard-list">
+                <!-- Player list will be dynamically populated here -->
+            </ul>
         </div>
-        <div class="hold-area" id="hold-area"></div>
     </div>
     <script src="script.js"></script>
 </body>
