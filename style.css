@@ -14,6 +14,19 @@ body {
     gap: 40px;
 }
 
+/* Responsive layout for wider screens */
+@media (max-width: 960px) {
+    .main-wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .leaderboard {
+        width: 100%;
+        max-width: 364px; /* Match game container width */
+    }
+}
+
 .container {
     text-align: center;
     background-color: white;
