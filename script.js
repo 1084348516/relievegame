@@ -30,13 +30,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchLeaderboard() {
         try {
-            const response = await fetch('http://8.138.186.187:8088/api/rank/top10');
+            const response = await fetch('https://www.sweetpet.fun/api/rank/top10');
             const result = await response.json();
             if (result.code === 200) {
                 leaderboardList.innerHTML = '';
-                result.data.forEach(player => {
+                result.data.forEach((player, index) => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<span>${player.playerName}</span> - ${player.countryName}`;
+                    let trophy = '';
+                    if (index === 0) {
+                        trophy = '🥇';
+                    } else if (index === 1) {
+                        trophy = '🥈';
+                    } else if (index === 2) {
+                        trophy = '🥉';
+                    }
+                    li.innerHTML = `${trophy} <span>${player.playerName}</span> - ${player.countryName}`;
                     leaderboardList.appendChild(li);
                 });
             } else {
@@ -231,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function submitRank(playerName, countryName) {
         try {
-            const response = await fetch('http://8.138.186.187:8088/api/rank', {
+            const response = await fetch('https://www.sweetpet.fun/api/rank', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
