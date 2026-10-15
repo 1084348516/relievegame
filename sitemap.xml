@@ -22,4 +22,11 @@
         <priority>0.6</priority>
     </url>
 
+    <url>
+        <loc>https://www.lolgeng.com/91</loc>
+        <lastmod>2026-10-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
 </urlset>

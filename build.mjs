@@ -3,7 +3,7 @@
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 
 const SITE = 'https://www.lolgeng.com';
-const STATIC = ['event.html', 'robots.txt', 'sitemap.xml', 'llms.txt'];
+const STATIC = ['event.html', '91.html', 'robots.txt', 'sitemap.xml', 'llms.txt'];
 
 const text = {
   zh: {
