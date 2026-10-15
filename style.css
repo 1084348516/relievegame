@@ -174,3 +174,28 @@ h1 {
     border-radius: 5px;
 }
 
+
+.about {
+    max-width: 760px;
+    margin: 40px auto 0;
+    background-color: white;
+    padding: 24px 28px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    color: #444;
+    line-height: 1.6;
+}
+
+.about h2 {
+    color: #333;
+    font-size: 20px;
+    margin: 24px 0 8px;
+}
+
+.about h2:first-child {
+    margin-top: 0;
+}
+
+.about a {
+    color: #007bff;
+}
