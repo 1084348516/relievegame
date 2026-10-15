@@ -1,8 +1,7 @@
-# LOL Geng
+# LOL梗 (LOL Geng)
 
-> LOL Geng (www.lolgeng.com) hosts Tap Tap Tap, a free browser-based tile matching puzzle game for quick, stress-relieving breaks. No download or sign-up required; works on desktop and mobile.
+> LOL梗 (www.lolgeng.com) collects funny Chinese internet memes, one interactive page per meme. Content is in Chinese.
 
-## Pages
+## Memes
 
-- [Tap Tap Tap](https://www.lolgeng.com/): The game. Tap uncovered animal and fruit tiles to move them into a 7-tile slot bar; three identical tiles match and disappear. Clear the board to pass the level. Hold, Undo and Restart buttons help; beating all three levels adds the player to the Hall of Fame leaderboard.
-- [Crazy Thursday](https://www.lolgeng.com/event): A playful "Crazy Thursday / V me 50" meme page with a countdown to the next Thursday and animated effects (Chinese).
+- [疯狂星期四 Crazy Thursday](https://www.lolgeng.com/event): The weekly "Crazy Thursday / V me 50" meme, with a countdown to the next Thursday and animated effects.
