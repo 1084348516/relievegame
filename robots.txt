@@ -1,11 +1,11 @@
-# robots.txt for relievegame.space - Bubble Pop Stress Relief Game
+# robots.txt for www.lolgeng.com
 
 # Allow all search engines to crawl the site
 User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://www.relievegame.space/sitemap.xml
+Sitemap: https://www.lolgeng.com/sitemap.xml
 
 # Allow major search engines
 User-agent: Googlebot
