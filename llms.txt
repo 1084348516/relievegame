@@ -1,7 +1,7 @@
-# LOL梗 (LOL Geng)
+# LOL梗 (LOLgeng)
 
-> LOL梗 (www.lolgeng.com) collects funny Chinese internet memes, one interactive page per meme. Content is in Chinese.
+> LOLgeng (www.lolgeng.com) collects funny internet memes from China and around the world, one interactive page per meme. Homepages: Chinese at https://www.lolgeng.com/ and English at https://www.lolgeng.com/en/.
 
 ## Memes
 
-- [疯狂星期四 Crazy Thursday](https://www.lolgeng.com/event): The weekly "Crazy Thursday / V me 50" meme, with a countdown to the next Thursday and animated effects.
+- [疯狂星期四 Crazy Thursday](https://www.lolgeng.com/event): China's weekly "Crazy Thursday / V me 50" KFC meme, with a countdown to the next Thursday and animated effects (page in Chinese).

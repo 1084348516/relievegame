@@ -1,0 +1,16 @@
+[
+  {
+    "url": "/event",
+    "emoji": "🍗",
+    "zh": {
+      "name": "疯狂星期四",
+      "desc": "每周四准时出现的 V 我 50 文学，附带距离下一个周四的倒计时。",
+      "tag": "每周四"
+    },
+    "en": {
+      "name": "Crazy Thursday",
+      "desc": "China's weekly \"V me 50\" KFC meme, with a countdown to the next Thursday.",
+      "tag": "Chinese meme"
+    }
+  }
+]

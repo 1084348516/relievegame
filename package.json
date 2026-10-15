@@ -2,6 +2,6 @@
   "name": "relievegame",
   "private": true,
   "scripts": {
-    "build": "rm -rf dist && mkdir dist && cp *.html robots.txt sitemap.xml llms.txt dist/"
+    "build": "node build.mjs"
   }
 }
