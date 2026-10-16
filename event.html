@@ -160,7 +160,9 @@
   const API = '/api';
   const hit = (key, n = 1) => fetch(API + '/hit', { method: 'POST', body: JSON.stringify({ key, n }), keepalive: true })
     .then(r => r.ok ? r.json() : Promise.reject(r.status));
-  let server = 0, pending = 0, count = 0, flushing = false, flushTimer;
+  // The server counts at most 20 clicks per IP per day; `out` stops reporting once that's used up.
+  let server = 0, pending = 0, count = 0, flushing = false, out = false, flushTimer;
+  const OUT_MSG = '今天已经 V 够 ¥1000 了 · 老板明天再来';
   const total = () => server + pending;
   const showSum = () => { $('sum').textContent = '¥' + (total() * 50).toLocaleString(); };
 
@@ -176,7 +178,10 @@
     flushing = true;
     const n = Math.min(pending, 20);
     hit('event_v50', n)
-      .then(r => { pending -= n; server = r.n; })
+      .then(r => {
+        pending -= n; server = r.n;
+        if (r.left === 0) { out = true; pending = 0; $('thanks').textContent = OUT_MSG; }
+      })
       .catch(() => { pending -= n; server += n; })
       .finally(() => { flushing = false; showSum(); if (pending) flushTimer = setTimeout(flush, 400); });
   }
@@ -185,14 +190,19 @@
   });
 
   $('v50').addEventListener('click', e => {
-    count++; pending++;
-    showSum();
-    $('thanks').textContent = `你是第 ${total()} 位好心人 · ${thanks[(count - 1) % thanks.length]}`;
-    clearTimeout(flushTimer); flushTimer = setTimeout(flush, 800);
+    count++;
+    if (out) {
+      $('thanks').textContent = OUT_MSG;
+    } else {
+      pending++;
+      showSum();
+      $('thanks').textContent = `你是第 ${total()} 位好心人 · ${thanks[(count - 1) % thanks.length]}`;
+      clearTimeout(flushTimer); flushTimer = setTimeout(flush, 800);
+    }
     const r = e.currentTarget.getBoundingClientRect();
     const pop = document.createElement('div');
     pop.className = 'pop';
-    pop.textContent = '+¥50';
+    pop.textContent = out ? '心意收到了' : '+¥50';
     pop.style.left = r.left + r.width / 2 + (Math.random() - .5) * 40 + 'px';
     pop.style.top = r.top - 8 + 'px';
     document.body.appendChild(pop);
