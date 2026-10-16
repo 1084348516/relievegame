@@ -7,6 +7,13 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "run_worker_first": ["/"]
-  }
+    "run_worker_first": ["/", "/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "relievegame-counter",
+      "database_id": "a59e189d-ed37-430f-b03e-1ef341b05475"
+    }
+  ]
 }

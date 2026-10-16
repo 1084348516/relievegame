@@ -1,10 +1,14 @@
 // Sends visitors of "/" to the English homepage unless their browser prefers Chinese.
 // "/?lang=zh|en" (the language switcher) remembers an explicit choice in a cookie.
+// "/api/*" is the page counter (see counter.js).
+import { handleCounter } from './counter.js';
+
 const YEAR = 60 * 60 * 24 * 365;
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname.startsWith('/api/')) return handleCounter(request, env, url);
     if (url.pathname !== '/') return env.ASSETS.fetch(request);
 
     const chosen = url.searchParams.get('lang');

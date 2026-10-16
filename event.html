@@ -10,296 +10,108 @@
 <meta property="og:title" content="Nebulink API">
 <meta property="og:description" content="Nebulink API">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236d5dfc'/%3E%3Cstop offset='1' stop-color='%2322c1ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M19 45V19l26 26V19' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='19' cy='19' r='4.5' fill='%23fff'/%3E%3Ccircle cx='45' cy='45' r='4.5' fill='%23fff'/%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=ZCOOL+KuaiLe&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --red: #d62718;
-    --red-deep: #b01c10;
+    --red: #c8251a;
     --cream: #fff3dc;
-    --ink: #1d0f0a;
-    --gold: #ffbf1f;
+    --soft: rgba(255, 243, 220, .7);
+    --line: rgba(255, 243, 220, .18);
+    --gold: #ffc23d;
     --display: "ZCOOL KuaiLe", "PingFang SC", "Microsoft YaHei", sans-serif;
-    --latin: "Anton", "Impact", "Arial Black", sans-serif;
     --mono: "JetBrains Mono", "Consolas", monospace;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; }
+  html, body { margin: 0; min-height: 100%; }
   body {
     background: var(--red);
     color: var(--cream);
-    font-family: var(--display);
-    overflow-x: hidden;
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+    display: flex; flex-direction: column; min-height: 100vh;
+  }
+  main {
+    flex: 1; width: 100%; max-width: 560px; margin: 0 auto;
+    padding: clamp(40px, 10vh, 96px) 16px 48px;
+    display: flex; flex-direction: column; gap: 28px;
   }
 
-  /* ---------- background: rolling bucket stripes + grain ---------- */
-  .stripes {
-    position: fixed; inset: -10%;
-    background: repeating-linear-gradient(90deg, var(--red) 0 64px, var(--red-deep) 64px 128px);
-    transform: rotate(-8deg);
-    animation: roll 8s linear infinite;
-    z-index: 0;
-  }
-  @keyframes roll { to { background-position: 128px 0; } }
-  .grain {
-    position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: .18; mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  #fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+  .countdown { font-family: var(--mono); font-size: 13px; color: var(--soft); letter-spacing: .04em; }
+  .countdown b { color: var(--gold); font-weight: 500; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .back { font-size: 13px; color: var(--soft); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+  .back:hover { color: var(--cream); border-color: var(--cream); }
 
-  /* ---------- top bar ---------- */
-  .top {
-    position: relative; z-index: 3;
-    display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
-    padding: calc(18px + env(safe-area-inset-top, 0px)) clamp(16px, 4vw, 48px) 0;
-    font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+  h1 {
+    margin: 0; font-family: var(--display); font-weight: 400;
+    font-size: clamp(56px, 16vw, 104px); line-height: 1; letter-spacing: .02em;
   }
-  .top .tag { display: flex; align-items: center; gap: 10px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 3px rgba(255,191,31,.3); animation: blink 1.2s steps(2) infinite; }
-  @keyframes blink { 50% { opacity: .2; } }
-  .countdown b { color: var(--gold); font-weight: 700; }
-  .replay {
-    font: inherit; color: var(--cream); background: transparent; cursor: pointer;
-    border: 1.5px solid var(--cream); border-radius: 999px; padding: 6px 12px;
-  }
-  .replay:hover { background: var(--cream); color: var(--red); }
-  .top .actions { display: flex; gap: 8px; }
-  a.replay { text-decoration: none; }
+  h1 em { font-style: normal; color: var(--gold); }
+  .sub { margin: 10px 0 0; font-family: var(--mono); font-size: 12px; letter-spacing: .3em; color: var(--soft); }
 
-  /* ---------- stage ---------- */
-  .stage {
-    position: relative; z-index: 3;
-    max-width: 1100px; margin: 0 auto;
-    padding: clamp(24px, 5vh, 56px) clamp(16px, 4vw, 48px) 120px;
-    display: grid; grid-template-columns: 1.25fr 1fr; gap: clamp(24px, 4vw, 56px); align-items: center;
-  }
-  @media (max-width: 820px) { .stage { grid-template-columns: 1fr; } }
-
-  .week { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
-  .week span {
-    width: 38px; height: 38px; display: grid; place-items: center;
-    border: 1.5px solid rgba(255,243,220,.45); border-radius: 50%;
-    font-size: 16px; color: rgba(255,243,220,.6);
-  }
-  .week span.thu {
-    background: var(--gold); color: var(--ink); border-color: var(--ink);
-    box-shadow: 3px 3px 0 var(--ink); transform: rotate(-10deg) scale(1.2);
-  }
-
-  .title {
-    margin: 0; line-height: .95;
-    font-size: clamp(64px, 13vw, 168px); font-weight: 400;
-    color: var(--cream);
-    text-shadow: 6px 6px 0 var(--ink);
-    display: flex; flex-wrap: wrap;
-  }
-  .title span { display: inline-block; opacity: 0; }
-  .title.go span { animation: drop .9s cubic-bezier(.2, 1.6, .4, 1) forwards; }
-  .title span:nth-child(4) { color: var(--gold); }
-  .title span:nth-child(5) { color: var(--gold); }
-  @keyframes drop {
-    0%   { opacity: 0; transform: translateY(-140%) rotate(-20deg); }
-    60%  { opacity: 1; }
-    100% { opacity: 1; transform: translateY(0) rotate(var(--r, 0deg)); }
-  }
-  .sub {
-    margin: 14px 0 0; font-family: var(--latin); font-size: clamp(22px, 3.4vw, 40px);
-    letter-spacing: .06em; color: var(--ink);
-    display: inline-block; background: var(--cream); padding: 2px 14px 0;
-    transform: rotate(-2deg);
-  }
-
-  /* rotating badge */
-  .badge-wrap { position: relative; width: clamp(150px, 22vw, 210px); aspect-ratio: 1; margin-top: 26px; }
-  .badge-ring { position: absolute; inset: 0; animation: spin 14s linear infinite; }
-  .badge-ring text { font-family: var(--mono); font-size: 11.5px; font-weight: 700; letter-spacing: 3px; fill: var(--cream); }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .badge-core {
-    position: absolute; inset: 22%; border-radius: 50%;
-    background: var(--gold); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink);
-    display: grid; place-items: center;
-    animation: wobble 2.4s ease-in-out infinite;
-  }
-  .badge-core svg { width: 62%; }
-  @keyframes wobble { 50% { transform: rotate(-14deg) scale(1.05); } }
-
-  /* ---------- right column: lore card + button ---------- */
-  .right { display: flex; flex-direction: column; gap: 28px; }
-  .card {
-    position: relative;
-    background: var(--cream); color: var(--ink);
-    padding: 34px 26px 26px; border-radius: 4px;
-    box-shadow: 10px 10px 0 var(--ink);
-    transform: rotate(1.5deg);
-    min-height: 220px;
-  }
-  .card::before {
-    content: ""; position: absolute; top: -12px; left: 50%; width: 110px; height: 26px;
-    transform: translateX(-50%) rotate(-3deg);
-    background: rgba(255,191,31,.85);
-  }
-  .card .meta {
-    display: flex; justify-content: space-between;
-    font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
-    border-bottom: 1.5px dashed var(--ink); padding-bottom: 10px; margin-bottom: 14px;
-  }
-  .card p { margin: 0; font-size: clamp(18px, 2.1vw, 22px); line-height: 1.6; min-height: 5em; }
-  .caret { display: inline-block; width: .55em; height: 1.05em; background: var(--red); vertical-align: -0.15em; margin-left: 2px; animation: blink .8s steps(2) infinite; }
+  .lore { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 22px 0; }
+  .lore .no { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; color: var(--soft); margin-bottom: 10px; }
+  .lore p { margin: 0; font-size: 18px; line-height: 1.75; min-height: 3.5em; transition: opacity .3s; }
+  .lore p.fade { opacity: 0; }
 
   .v50 {
-    position: relative;
-    font-family: var(--display); font-size: clamp(30px, 4vw, 42px);
-    color: var(--ink); background: var(--gold);
-    border: 3px solid var(--ink); border-radius: 999px;
-    padding: 14px 34px; cursor: pointer;
-    box-shadow: 7px 7px 0 var(--ink);
-    transition: transform .08s, box-shadow .08s;
-    display: inline-flex; align-items: center; gap: 12px; align-self: flex-start;
+    align-self: flex-start;
+    font: inherit; font-size: 20px; font-weight: 600;
+    color: var(--red); background: var(--cream);
+    border: 0; border-radius: 999px; padding: 14px 32px; cursor: pointer;
+    transition: transform .1s, background .15s;
   }
-  .v50:hover { transform: translate(-2px, -2px) rotate(-1deg); box-shadow: 9px 9px 0 var(--ink); }
-  .v50:active { transform: translate(5px, 5px); box-shadow: 2px 2px 0 var(--ink); }
-  .v50 .yen { font-family: var(--latin); font-size: .8em; background: var(--ink); color: var(--gold); border-radius: 999px; padding: 2px 12px 0; }
-  .tally { font-family: var(--mono); font-size: 13px; letter-spacing: .06em; margin-top: -10px; }
-  .tally b { color: var(--gold); font-size: 18px; }
+  .v50:hover { background: #fff; }
+  .v50:active { transform: scale(.96); }
+  .tally { font-size: 14px; color: var(--soft); line-height: 1.9; margin-top: -12px; }
+  .tally b { color: var(--gold); font-weight: 600; font-family: var(--mono); }
   .pop {
-    position: fixed; z-index: 6; pointer-events: none;
-    font-family: var(--display); font-size: 26px; color: var(--cream);
-    text-shadow: 3px 3px 0 var(--ink);
-    animation: pop 1.1s ease-out forwards;
-    white-space: nowrap;
+    position: fixed; pointer-events: none; font-weight: 700; font-size: 18px; color: var(--gold);
+    transform: translateX(-50%); animation: pop .9s ease-out forwards;
   }
-  @keyframes pop {
-    0% { opacity: 0; transform: translate(-50%, 0) scale(.6); }
-    20% { opacity: 1; transform: translate(-50%, -20px) scale(1.15); }
-    100% { opacity: 0; transform: translate(-50%, -90px) scale(1); }
-  }
+  @keyframes pop { from { opacity: 1; } to { opacity: 0; transform: translate(-50%, -48px); } }
 
-  /* ---------- marquee ---------- */
-  .marquee {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 4;
-    background: var(--ink); color: var(--gold);
-    border-top: 3px solid var(--gold);
-    padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px));
-    overflow: hidden; white-space: nowrap;
-    font-family: var(--latin); font-size: 22px; letter-spacing: .08em;
-  }
-  .marquee .track { display: inline-block; animation: marq 22s linear infinite; }
-  .marquee .track span { margin: 0 18px; }
-  .marquee .track .zh { font-family: var(--display); color: var(--cream); }
-  @keyframes marq { to { transform: translateX(-50%); } }
+  footer { text-align: center; padding: 0 16px calc(24px + env(safe-area-inset-bottom, 0px)); font-size: 12px; color: var(--soft); opacity: .7; }
 
-  /* ---------- intro: straight to THU! ---------- */
-  .intro {
-    position: fixed; inset: 0; z-index: 10;
-    background: var(--cream); color: var(--ink);
-    display: grid; place-items: center; text-align: center;
-    clip-path: circle(150% at 50% 50%);
-    transition: clip-path .8s cubic-bezier(.7, 0, .3, 1);
-  }
-  .intro.out { clip-path: circle(0% at 50% 50%); pointer-events: none; }
-  .intro.thu { background: var(--red); color: var(--cream); }
-  .intro .en { font-family: var(--latin); font-size: clamp(16px, 2.4vw, 24px); letter-spacing: .4em; opacity: .55; }
-  .intro .zh { font-size: clamp(110px, 26vw, 300px); line-height: 1; margin: 6px 0; }
-  .intro .cap { font-family: var(--mono); font-size: 14px; letter-spacing: .2em; opacity: .7; }
-  .intro .step { animation: fadeUp .35s ease-out; }
-  .intro.thu .step { animation: slam .55s cubic-bezier(.2, 1.4, .4, 1); }
-  .intro.thu .zh { color: var(--gold); text-shadow: 8px 8px 0 var(--ink); }
-  .intro.thu .cap { opacity: 1; font-size: 18px; }
-  .intro.shake { animation: shake .45s linear; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } }
-  @keyframes slam { from { transform: scale(3.2) rotate(-8deg); opacity: 0; } }
-  @keyframes shake {
-    20% { transform: translate(-10px, 6px); } 40% { transform: translate(9px, -8px); }
-    60% { transform: translate(-6px, -4px); } 80% { transform: translate(5px, 6px); }
-  }
-  .flash { position: fixed; inset: 0; background: #fff; z-index: 11; pointer-events: none; opacity: 0; }
-  .flash.on { animation: flash .4s ease-out; }
-  @keyframes flash { 0% { opacity: .9; } 100% { opacity: 0; } }
-
-  .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s, transform .6s cubic-bezier(.2, 1.3, .4, 1); }
-  .shown .reveal { opacity: 1; transform: none; }
-  .shown .reveal.d1 { transition-delay: .55s; }
-  .shown .reveal.d2 { transition-delay: .75s; }
-  .shown .reveal.d3 { transition-delay: .95s; }
+  .in { animation: in .6s ease-out backwards; }
+  .in.d1 { animation-delay: .1s; } .in.d2 { animation-delay: .2s; } .in.d3 { animation-delay: .3s; }
+  @keyframes in { from { opacity: 0; transform: translateY(8px); } }
 
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
   }
 </style>
 </head>
 <body>
-  <div class="stripes"></div>
-  <div class="grain"></div>
-  <canvas id="fx"></canvas>
-  <div class="flash" id="flash"></div>
-
-  <div class="intro thu" id="intro">
-    <div class="step" id="introStep">
-      <div class="en">THURSDAY</div>
-      <div class="zh">周四</div>
-      <div class="cap">！！！V 我 50 ！！！</div>
-    </div>
+<main>
+  <div class="topbar in">
+    <a class="back" href="/">← 全部梗</a>
+    <div class="countdown" id="countdown">——</div>
   </div>
 
-  <header class="top">
-    <div class="tag"><i class="dot"></i>Weekly Ritual · Vol.∞</div>
-    <div class="countdown" id="countdown">——</div>
-    <div class="actions">
-      <a class="replay" href="/">← 全部梗</a>
-      <button class="replay" id="replay">↺ 再来一遍</button>
-    </div>
+  <header class="in d1">
+    <h1>疯狂<em>星期四</em></h1>
+    <p class="sub">CRAZY THURSDAY · V ME 50</p>
   </header>
 
-  <main class="stage" id="stage">
-    <section>
-      <div class="week reveal">
-        <span>一</span><span>二</span><span>三</span><span class="thu">四</span><span>五</span><span>六</span><span>日</span>
-      </div>
-      <h1 class="title" id="title">
-        <span style="--r:-4deg">疯</span><span style="--r:3deg">狂</span><span style="--r:-2deg">星</span><span style="--r:5deg">期</span><span style="--r:-6deg">四</span>
-      </h1>
-      <div class="sub reveal d1">CRAZY THURSDAY</div>
-      <div class="badge-wrap reveal d2" aria-hidden="true">
-        <svg class="badge-ring" viewBox="0 0 200 200">
-          <defs><path id="circ" d="M100,100 m-82,0 a82,82 0 1,1 164,0 a82,82 0 1,1 -164,0"/></defs>
-          <text><textPath href="#circ">V ME 50 ✦ CRAZY THURSDAY ✦ V ME 50 ✦ CRAZY THURSDAY ✦</textPath></text>
-        </svg>
-        <div class="badge-core">
-          <svg viewBox="0 0 100 100">
-            <g transform="rotate(-35 50 50)">
-              <rect x="44" y="52" width="12" height="34" rx="5" fill="#fff3dc" stroke="#1d0f0a" stroke-width="3"/>
-              <circle cx="43" cy="88" r="7" fill="#fff3dc" stroke="#1d0f0a" stroke-width="3"/>
-              <circle cx="57" cy="88" r="7" fill="#fff3dc" stroke="#1d0f0a" stroke-width="3"/>
-              <path d="M50 8 C76 8 82 36 70 52 C64 60 36 60 30 52 C18 36 24 8 50 8 Z" fill="#c8741f" stroke="#1d0f0a" stroke-width="3"/>
-              <path d="M38 20 C42 15 50 14 55 16" stroke="#ffd79a" stroke-width="4" fill="none" stroke-linecap="round"/>
-            </g>
-          </svg>
-        </div>
-      </div>
-    </section>
+  <section class="lore in d2">
+    <div class="no" id="loreNo">疯四文学 № 01</div>
+    <p id="lore"></p>
+  </section>
 
-    <section class="right">
-      <article class="card reveal d2">
-        <div class="meta"><span>疯四文学</span><span id="loreNo">№ 01</span></div>
-        <p><span id="lore"></span><span class="caret"></span></p>
-      </article>
-      <button class="v50 reveal d3" id="v50">V 我 <span class="yen">¥50</span></button>
-      <div class="tally reveal d3">已收到 <b id="sum">¥0</b> · <span id="thanks">等待第一位好心人</span></div>
-    </section>
-  </main>
-
-  <div class="marquee" aria-hidden="true">
-    <div class="track" id="track"></div>
+  <button class="v50 in d3" id="v50">V 我 50</button>
+  <div class="tally in d3">
+    全网已收到 <b id="sum">¥0</b> · <span id="thanks">等待第一位好心人</span>
+    <div id="crowd" hidden>你是第 <b id="visits">—</b> 位路过此地的人</div>
   </div>
+</main>
+<footer>纯属玩梗 · 每周四准时发疯</footer>
 
 <script>
 (() => {
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const $ = id => document.getElementById(id);
-
-  /* ---------------- marquee ---------------- */
-  const unit = '<span>CRAZY THURSDAY</span>✦<span class="zh">疯狂星期四</span>✦<span>V ME 50</span>✦<span class="zh">V我50</span>✦';
-  $('track').innerHTML = unit.repeat(8);
 
   /* ---------------- countdown to next Thursday ---------------- */
   function tick() {
@@ -319,101 +131,7 @@
   }
   tick(); setInterval(tick, 1000);
 
-  /* ---------------- particles: coins + drumsticks ---------------- */
-  const cv = $('fx'), ctx = cv.getContext('2d');
-  let W, H, dpr;
-  function resize() {
-    dpr = Math.min(devicePixelRatio || 1, 2);
-    W = innerWidth; H = innerHeight;
-    cv.width = W * dpr; cv.height = H * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-  resize(); addEventListener('resize', resize);
-
-  const parts = [];
-  function spawn(x, y, kind, burst) {
-    const a = burst ? (-Math.PI / 2 + (Math.random() - .5) * 2.2) : Math.PI / 2;
-    const sp = burst ? 7 + Math.random() * 9 : 1 + Math.random() * 1.5;
-    parts.push({
-      kind, x, y,
-      vx: Math.cos(a) * sp + (burst ? 0 : (Math.random() - .5)),
-      vy: Math.sin(a) * sp,
-      r: Math.random() * Math.PI * 2,
-      vr: (Math.random() - .5) * .25,
-      spin: Math.random() * Math.PI * 2,
-      size: kind === 'coin' ? 16 + Math.random() * 8 : 26 + Math.random() * 12,
-      g: burst ? .38 : .04,
-      alpha: burst ? 1 : .55,
-    });
-  }
-
-  function drawCoin(p) {
-    const sx = Math.cos(p.spin);
-    ctx.scale(Math.abs(sx) < .15 ? .15 : sx, 1);
-    ctx.beginPath(); ctx.arc(0, 0, p.size, 0, Math.PI * 2);
-    ctx.fillStyle = '#ffbf1f'; ctx.fill();
-    ctx.lineWidth = 2.5; ctx.strokeStyle = '#1d0f0a'; ctx.stroke();
-    ctx.beginPath(); ctx.arc(0, 0, p.size * .72, 0, Math.PI * 2);
-    ctx.strokeStyle = '#b07a00'; ctx.lineWidth = 1.5; ctx.stroke();
-    ctx.fillStyle = '#1d0f0a';
-    ctx.font = `${p.size * .9}px Anton, Impact, sans-serif`;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('50', 0, p.size * .06);
-  }
-  function drawLeg(p) {
-    const s = p.size / 40;
-    ctx.scale(s, s);
-    ctx.lineWidth = 3; ctx.strokeStyle = '#1d0f0a';
-    // bone
-    ctx.fillStyle = '#fff3dc';
-    ctx.beginPath(); ctx.roundRect(-6, 4, 12, 32, 5); ctx.fill(); ctx.stroke();
-    ctx.beginPath(); ctx.arc(-7, 38, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    ctx.beginPath(); ctx.arc(7, 38, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    // meat
-    ctx.fillStyle = '#c8741f';
-    ctx.beginPath();
-    ctx.moveTo(0, -40);
-    ctx.bezierCurveTo(26, -40, 32, -12, 20, 4);
-    ctx.bezierCurveTo(14, 12, -14, 12, -20, 4);
-    ctx.bezierCurveTo(-32, -12, -26, -40, 0, -40);
-    ctx.fill(); ctx.stroke();
-    ctx.strokeStyle = '#ffd79a'; ctx.lineWidth = 4; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(-12, -28); ctx.quadraticCurveTo(-6, -35, 4, -34); ctx.stroke();
-  }
-
-  function loop() {
-    ctx.clearRect(0, 0, W, H);
-    for (let i = parts.length - 1; i >= 0; i--) {
-      const p = parts[i];
-      p.vy += p.g; p.x += p.vx; p.y += p.vy;
-      p.vx *= .995; p.r += p.vr; p.spin += .18;
-      if (p.y - 60 > H) { parts.splice(i, 1); continue; }
-      ctx.save();
-      ctx.globalAlpha = p.alpha;
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.kind === 'coin' ? p.vr * 2 : p.r);
-      p.kind === 'coin' ? drawCoin(p) : drawLeg(p);
-      ctx.restore();
-    }
-    requestAnimationFrame(loop);
-  }
-  if (!reduce) requestAnimationFrame(loop);
-
-  // gentle ambient drumstick rain — heavier on actual Thursdays
-  if (!reduce) {
-    const rate = new Date().getDay() === 4 ? 450 : 1400;
-    setInterval(() => {
-      if (document.hidden || parts.length > 120) return;
-      spawn(Math.random() * W, -60, Math.random() < .7 ? 'leg' : 'coin', false);
-    }, rate);
-  }
-
-  function explode(x, y, n = 18) {
-    if (reduce) return;
-    for (let i = 0; i < n; i++) spawn(x, y, Math.random() < .7 ? 'coin' : 'leg', true);
-  }
-
-  /* ---------------- lore typewriter ---------------- */
+  /* ---------------- lore rotation ---------------- */
   const lore = [
     '我是秦始皇，其实我并没有死。今天是疯狂星期四，V我50，朕封你为大将军。',
     '世界上最远的距离，不是生与死，而是星期四已经到了，你还没有 V 我 50。',
@@ -423,77 +141,63 @@
     '你以为这只是一条普通的消息？不，这是一个成年人最后的体面：V我50。',
     '我不是在乞讨，我是在给你一个成为好人的机会。今天限时开放，价格 50。',
   ];
-  let li = 0, timer;
-  function typeLore() {
-    clearTimeout(timer);
-    const text = lore[li], el = $('lore');
-    $('loreNo').textContent = '№ ' + String(li + 1).padStart(2, '0');
-    let i = 0; el.textContent = '';
-    (function step() {
-      el.textContent = text.slice(0, ++i);
-      if (i < text.length) {
-        const ch = text[i - 1];
-        timer = setTimeout(step, '，。！？—'.includes(ch) ? 260 : 55 + Math.random() * 50);
-      } else {
-        timer = setTimeout(() => { li = (li + 1) % lore.length; typeLore(); }, 2800);
-      }
-    })();
+  let li = 0;
+  function showLore() {
+    $('loreNo').textContent = '疯四文学 № ' + String(li + 1).padStart(2, '0');
+    $('lore').textContent = lore[li];
+    $('lore').classList.remove('fade');
   }
+  showLore();
+  setInterval(() => {
+    $('lore').classList.add('fade');
+    setTimeout(() => { li = (li + 1) % lore.length; showLore(); }, 300);
+  }, 6000);
 
   /* ---------------- V我50 button ---------------- */
   const thanks = ['谢谢老板！', '老板大气！', '鸡腿 +1', '你是好人', '已转告秦始皇', '前任都没你大方', '下周四还来吗', '原味鸡已在路上'];
-  let sum = 0, count = 0;
+  // Global tally lives in the site Worker (src/counter.js). Clicks are batched so
+  // button mashing doesn't turn into one request per click.
+  const API = '/api';
+  const hit = (key, n = 1) => fetch(API + '/hit', { method: 'POST', body: JSON.stringify({ key, n }), keepalive: true })
+    .then(r => r.ok ? r.json() : Promise.reject(r.status));
+  let server = 0, pending = 0, count = 0, flushing = false, flushTimer;
+  const total = () => server + pending;
+  const showSum = () => { $('sum').textContent = '¥' + (total() * 50).toLocaleString(); };
+
+  hit('event_visit').then(r => {
+    $('visits').textContent = r.n.toLocaleString();
+    $('crowd').hidden = false;
+  }).catch(() => {});
+  fetch(API + '/counts?keys=event_v50').then(r => r.ok ? r.json() : Promise.reject())
+    .then(r => { server = r.event_v50; showSum(); }).catch(() => {});
+
+  function flush() {
+    if (flushing || !pending) return;
+    flushing = true;
+    const n = Math.min(pending, 20);
+    hit('event_v50', n)
+      .then(r => { pending -= n; server = r.n; })
+      .catch(() => { pending -= n; server += n; })
+      .finally(() => { flushing = false; showSum(); if (pending) flushTimer = setTimeout(flush, 400); });
+  }
+  addEventListener('pagehide', () => {
+    if (pending) navigator.sendBeacon(API + '/hit', JSON.stringify({ key: 'event_v50', n: Math.min(pending, 20) }));
+  });
+
   $('v50').addEventListener('click', e => {
-    sum += 50; count++;
-    $('sum').textContent = '¥' + sum.toLocaleString();
-    $('thanks').textContent = `你是第 ${count} 位好心人 · ${thanks[(count - 1) % thanks.length]}`;
+    count++; pending++;
+    showSum();
+    $('thanks').textContent = `你是第 ${total()} 位好心人 · ${thanks[(count - 1) % thanks.length]}`;
+    clearTimeout(flushTimer); flushTimer = setTimeout(flush, 800);
     const r = e.currentTarget.getBoundingClientRect();
-    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-    explode(cx, cy, 14 + Math.min(count, 20));
     const pop = document.createElement('div');
     pop.className = 'pop';
     pop.textContent = '+¥50';
-    pop.style.left = cx + (Math.random() - .5) * 80 + 'px';
-    pop.style.top = r.top - 10 + 'px';
+    pop.style.left = r.left + r.width / 2 + (Math.random() - .5) * 40 + 'px';
+    pop.style.top = r.top - 8 + 'px';
     document.body.appendChild(pop);
-    setTimeout(() => pop.remove(), 1200);
+    setTimeout(() => pop.remove(), 900);
   });
-
-  /* ---------------- intro sequence ---------------- */
-  const wait = ms => new Promise(r => setTimeout(r, ms));
-  let running = false;
-
-  async function play() {
-    if (running) return;
-    running = true;
-    const intro = $('intro'), step = $('introStep'), title = $('title');
-    document.body.classList.remove('shown');
-    title.classList.remove('go');
-    intro.classList.remove('out', 'shake');
-    clearTimeout(timer); $('lore').textContent = '';
-
-    if (!reduce) {
-      // straight to Thursday: slam + shake + flash + burst
-      step.style.animation = 'none'; void step.offsetWidth; step.style.animation = '';
-      await wait(120);
-      intro.classList.add('shake');
-      $('flash').classList.remove('on'); void $('flash').offsetWidth; $('flash').classList.add('on');
-      explode(W / 2, H / 2, 40);
-      await wait(1600);
-    }
-    intro.classList.add('out');
-    await wait(reduce ? 0 : 350);
-    title.classList.add('go');
-    [...title.children].forEach((s, i) => s.style.animationDelay = i * 0.09 + 's');
-    if (reduce) [...title.children].forEach(s => s.style.opacity = 1);
-    document.body.classList.add('shown');
-    await wait(900);
-    typeLore();
-    running = false;
-  }
-
-  $('replay').addEventListener('click', play);
-  play();
 })();
 </script>
 </body>
