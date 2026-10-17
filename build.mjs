@@ -3,7 +3,7 @@
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 
 const SITE = 'https://www.lolgeng.com';
-const STATIC = ['event.html', '91.html', 'robots.txt', 'sitemap.xml', 'llms.txt', 'og'];
+const STATIC = ['event.html', '91.html', 'about.html', 'privacy.html', 'page.css', 'robots.txt', 'sitemap.xml', 'llms.txt', 'og'];
 
 const text = {
   zh: {
@@ -17,6 +17,8 @@ const text = {
     switchLabel: 'EN',
     switchTo: 'en',
     switchTitle: 'Switch to English',
+    aboutLabel: '关于本站',
+    privacyLabel: '隐私政策',
   },
   en: {
     htmlLang: 'en',
@@ -29,6 +31,8 @@ const text = {
     switchLabel: '中文',
     switchTo: 'zh',
     switchTitle: '切换到中文',
+    aboutLabel: 'About',
+    privacyLabel: 'Privacy',
   },
 };
 
@@ -132,6 +136,8 @@ function page(lang, memes) {
     border: 1px solid currentColor; border-radius: 999px; padding: 2px 10px;
   }
   footer { margin-top: 48px; color: var(--muted); font-size: 13px; text-align: center; }
+  footer nav { margin-top: 6px; }
+  footer a { color: inherit; }
   @media (max-width: 420px) { .tag { display: none; } }
 </style>
 </head>
@@ -149,7 +155,10 @@ function page(lang, memes) {
 ${items}
     </ul>
 
-    <footer>${esc(t.footer)}</footer>
+    <footer>
+      ${esc(t.footer)}
+      <nav><a href="/about">${esc(t.aboutLabel)}</a> · <a href="/privacy">${esc(t.privacyLabel)}</a></nav>
+    </footer>
   </div>
 </body>
 </html>

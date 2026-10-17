@@ -6,3 +6,8 @@
 
 - [疯狂星期四 Crazy Thursday](https://www.lolgeng.com/event): China's weekly "Crazy Thursday / V me 50" KFC meme, with a countdown to the next Thursday and animated effects (page in Chinese).
 - [91 · 老色批鉴定](https://www.lolgeng.com/91): Prank page for people searching "91" (slang for an adult site): instead of anything adult, it shows a cartoon portrait of a "老色批" (old perv) with a certification stamp. No adult content.
+
+## Site
+
+- [About](https://www.lolgeng.com/about): What the site is and what each meme page contains.
+- [Privacy](https://www.lolgeng.com/privacy): What data the site collects (hashed IPs for counters, a language cookie) and ad cookie notice.
