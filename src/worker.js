@@ -1,20 +1,14 @@
 // Sends visitors of "/" to the English homepage unless their browser prefers Chinese.
 // "/?lang=zh|en" (the language switcher) remembers an explicit choice in a cookie.
 // "/api/*" is the page counter (see counter.js).
-// The bare domain lolgeng.com permanently redirects to www so search engines see one site.
+// lolgeng.com → www and http → https are Cloudflare dashboard rules, not code.
 import { handleCounter } from './counter.js';
 
 const YEAR = 60 * 60 * 24 * 365;
-const CANONICAL_HOST = 'www.lolgeng.com';
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (url.hostname === 'lolgeng.com') {
-      url.hostname = CANONICAL_HOST;
-      url.protocol = 'https:';
-      return Response.redirect(url.toString(), 301);
-    }
     if (url.pathname.startsWith('/api/')) return handleCounter(request, env, url);
     if (url.pathname !== '/') return env.ASSETS.fetch(request);
 
