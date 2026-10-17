@@ -1,9 +1,9 @@
-// Builds dist/: the zh homepage (/), the en homepage (/en/), and copies static files.
+// Builds dist/: the zh homepage (/), the en homepage (/en/), and copies static files (incl. og/ share images from og.mjs).
 // Memes are listed in memes.json — add an entry there to show it on both homepages.
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 
 const SITE = 'https://www.lolgeng.com';
-const STATIC = ['event.html', '91.html', 'robots.txt', 'sitemap.xml', 'llms.txt'];
+const STATIC = ['event.html', '91.html', 'robots.txt', 'sitemap.xml', 'llms.txt', 'og'];
 
 const text = {
   zh: {
@@ -68,6 +68,10 @@ function page(lang, memes) {
 <meta property="og:url" content="${SITE}${t.path}">
 <meta property="og:title" content="${esc(t.title)}">
 <meta property="og:description" content="${esc(t.description)}">
+<meta property="og:image" content="${SITE}/og/home-${lang}.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤣</text></svg>">
 <style>
   :root {
@@ -158,4 +162,4 @@ rmSync('dist', { recursive: true, force: true });
 mkdirSync('dist/en', { recursive: true });
 writeFileSync('dist/index.html', page('zh', memes));
 writeFileSync('dist/en/index.html', page('en', memes));
-for (const f of STATIC) cpSync(f, `dist/${f}`);
+for (const f of STATIC) cpSync(f, `dist/${f}`, { recursive: true });
