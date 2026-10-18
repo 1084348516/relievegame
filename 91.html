@@ -160,8 +160,9 @@
 <body>
 <main>
   <a class="back" href="/">← 全部梗</a>
+  <!-- data-nosnippet: keep the bait text out of search result snippets; Google falls back to the meta description -->
   <!-- step 1: the bait -->
-  <section class="card" id="gate">
+  <section class="card" id="gate" data-nosnippet>
     <div class="lock">
       <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ff3d7f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
     </div>
@@ -178,14 +179,14 @@
   </section>
 
   <!-- step 2: fake loading -->
-  <section class="card" id="loading" hidden>
+  <section class="card" id="loading" hidden data-nosnippet>
     <h1 id="loadTitle">正在加载高清资源…</h1>
     <div class="bar"><i id="barFill"></i></div>
     <div class="log" id="log"></div>
   </section>
 
   <!-- step 3: busted -->
-  <section class="card" id="result" hidden>
+  <section class="card" id="result" hidden data-nosnippet>
     <figure class="portrait">
       <svg viewBox="0 0 240 260" role="img" aria-label="一位挑着眉、流着鼻血和口水的老色批画像">
         <path d="M30 260 Q36 212 96 204 L144 204 Q204 212 210 260 Z" fill="#f6c99a" stroke="#1d0f0a" stroke-width="4"/>

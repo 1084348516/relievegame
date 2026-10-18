@@ -11,7 +11,7 @@ export function wenanPage({ updated, categories }) {
   const total = categories.reduce((n, c) => n + c.items.length, 0);
   const count = `${Math.floor(total / 10) * 10}+`;
   const [y, m, d] = updated.split('-').map(Number);
-  const title = `疯狂星期四文案大全（${count}条）搞笑、霸总、古风、伤感 V我50文案 - LOL梗`;
+  const title = `疯狂星期四文案大全${y}（${count}条·每周更新）V我50搞笑文案 - LOL梗`;
   const description = `${total} 条原创疯狂星期四文案，按身世反转、深情伤感、震惊体、古风、霸总、通知体、打工人、一句话短文案分类，每条一键复制，每周更新。`;
 
   const toc = categories
@@ -39,7 +39,7 @@ ${c.items.map((t) => `      <li><p>${esc(t)}</p><button class="copy" type="butto
 <link rel="canonical" href="${SITE}${PATH}">
 <meta property="og:type" content="article">
 <meta property="og:url" content="${SITE}${PATH}">
-<meta property="og:title" content="疯狂星期四文案大全（${count}条）">
+<meta property="og:title" content="疯狂星期四文案大全${y}（${count}条·每周更新）">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:image" content="${SITE}/og/wenan.png">
 <meta property="og:image:width" content="1200">
@@ -49,7 +49,7 @@ ${c.items.map((t) => `      <li><p>${esc(t)}</p><button class="copy" type="butto
 <script type="application/ld+json">${JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Article',
-    headline: `疯狂星期四文案大全（${count}条）`,
+    headline: `疯狂星期四文案大全${y}（${count}条·每周更新）`,
     description,
     dateModified: updated,
     inLanguage: 'zh-CN',
