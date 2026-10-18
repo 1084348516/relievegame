@@ -47,6 +47,19 @@ const cards = {
     <h2>V 我 50</h2>
     <div class="emoji">🍗</div>
     <div class="site">lolgeng.com/event</div>`,
+  wenan: `
+    <style>${base}
+      body { background: radial-gradient(ellipse at 80% 50%, #e0392b 0%, #c8251a 55%, #9e1a11 100%); color: #fff3dc; }
+      .kicker { font-size: 30px; font-weight: 600; letter-spacing: .2em; color: #ffc23d; }
+      h1 { margin-top: 16px; font-size: 112px; font-weight: 900; line-height: 1.1; }
+      h1 em { font-style: normal; color: #ffc23d; }
+      p { margin-top: 24px; font-size: 38px; font-weight: 600; }
+    </style>
+    <div class="kicker">V 我 50 · 一键复制</div>
+    <h1>疯狂星期四<br><em>文案大全</em></h1>
+    <p>100+ 条 · 搞笑 / 霸总 / 古风 / 伤感</p>
+    <div class="emoji">🍗</div>
+    <div class="site">lolgeng.com/event/wenan</div>`,
   // The bait, not the punchline: this card shows up wherever the /91 prank link is shared.
   91: `
     <style>${base}

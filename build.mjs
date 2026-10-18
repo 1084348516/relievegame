@@ -1,6 +1,7 @@
 // Builds dist/: the zh homepage (/), the en homepage (/en/), and copies static files (incl. og/ share images from og.mjs).
 // Memes are listed in memes.json — add an entry there to show it on both homepages.
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { wenanPage } from './wenan.mjs';
 
 const SITE = 'https://www.lolgeng.com';
 const STATIC = ['event.html', '91.html', 'about.html', 'privacy.html', 'page.css', 'robots.txt', 'sitemap.xml', 'llms.txt', 'og'];
@@ -169,6 +170,8 @@ const memes = JSON.parse(readFileSync('memes.json', 'utf8'));
 
 rmSync('dist', { recursive: true, force: true });
 mkdirSync('dist/en', { recursive: true });
+mkdirSync('dist/event', { recursive: true });
 writeFileSync('dist/index.html', page('zh', memes));
 writeFileSync('dist/en/index.html', page('en', memes));
+writeFileSync('dist/event/wenan.html', wenanPage(JSON.parse(readFileSync('wenan.json', 'utf8'))));
 for (const f of STATIC) cpSync(f, `dist/${f}`, { recursive: true });

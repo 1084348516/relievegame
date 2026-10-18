@@ -26,5 +26,19 @@
       "desc": "China's weekly \"V me 50\" KFC meme, with a countdown to the next Thursday.",
       "tag": "Chinese meme"
     }
+  },
+  {
+    "url": "/event/wenan",
+    "emoji": "📋",
+    "zh": {
+      "name": "疯狂星期四文案大全",
+      "desc": "100+ 条原创疯四文学，按套路分类，一键复制直接发群。",
+      "tag": "文案"
+    },
+    "en": {
+      "name": "Crazy Thursday copy collection",
+      "desc": "100+ original \"V me 50\" Crazy Thursday lines, sorted by style, one-tap copy (in Chinese).",
+      "tag": "Chinese meme"
+    }
   }
 ]
