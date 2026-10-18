@@ -11,7 +11,7 @@ export function wenanPage({ updated, categories }) {
   const total = categories.reduce((n, c) => n + c.items.length, 0);
   const count = `${Math.floor(total / 10) * 10}+`;
   const [y, m, d] = updated.split('-').map(Number);
-  const title = `疯狂星期四文案大全${y}（${count}条·每周更新）V我50搞笑文案 - LOL梗`;
+  const title = `疯狂星期四文案大全${y}（${count}条·每周更新）V我50搞笑文案`;
   const description = `${total} 条原创疯狂星期四文案，按身世反转、深情伤感、震惊体、古风、霸总、通知体、打工人、一句话短文案分类，每条一键复制，每周更新。`;
 
   const toc = categories
