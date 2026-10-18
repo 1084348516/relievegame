@@ -47,17 +47,19 @@ const cards = {
     <h2>V 我 50</h2>
     <div class="emoji">🍗</div>
     <div class="site">lolgeng.com/event</div>`,
+  // The bait, not the punchline: this card shows up wherever the /91 prank link is shared.
   91: `
     <style>${base}
       body { background: radial-gradient(ellipse at 50% -10%, #2a1124 0%, #0c0b10 65%); color: #f1edf7; }
       h1 { font-size: 200px; font-weight: 900; line-height: 1; color: #ff3d7f; }
       h2 { margin-top: 24px; font-size: 72px; font-weight: 800; }
       p { margin-top: 20px; font-size: 38px; color: #8f88a0; }
+      .emoji { right: 150px; }
     </style>
     <h1>91</h1>
-    <h2>老色批鉴定中心</h2>
-    <p>你搜 91 是想找什么？</p>
-    <div class="emoji">😏</div>
+    <h2>内容已加密</h2>
+    <p>点开验证后查看</p>
+    <div class="emoji"><svg width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="#ff3d7f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
     <div class="site">lolgeng.com/91</div>`,
 };
 
