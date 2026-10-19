@@ -36,20 +36,23 @@ const KEYS = new Set([...Object.keys(ONCE), ...Object.keys(QUOTA), ...VOTE]);
 const MAX_STEP = 20;
 
 // Create tables and the hashing salt on first use, so a fresh database needs no manual setup.
+// Everything goes in one batch: each D1 call is a round trip to the database, which dominates latency.
 let ready;
 const init = (db) =>
   (ready ??= (async () => {
-    for (const sql of [
+    const fresh = [...crypto.getRandomValues(new Uint8Array(32))].map((b) => b.toString(16).padStart(2, '0')).join('');
+    const res = await db.batch([
       'CREATE TABLE IF NOT EXISTS counters (key TEXT PRIMARY KEY, n INTEGER NOT NULL DEFAULT 0)',
       'CREATE TABLE IF NOT EXISTS visitors (grp TEXT NOT NULL, who TEXT NOT NULL, key TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (grp, who))',
       'CREATE TABLE IF NOT EXISTS quota (grp TEXT NOT NULL, who TEXT NOT NULL, used INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (grp, who))',
       'CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT NOT NULL)',
-    ]) await db.prepare(sql).run();
-    await db.batch(Object.entries(SEED).map(([k, n]) =>
-      db.prepare('INSERT INTO counters (key, n) VALUES (?, ?) ON CONFLICT(key) DO NOTHING').bind(k, n)));
-    const fresh = [...crypto.getRandomValues(new Uint8Array(32))].map((b) => b.toString(16).padStart(2, '0')).join('');
-    await db.prepare("INSERT INTO meta (k, v) VALUES ('salt', ?) ON CONFLICT(k) DO NOTHING").bind(fresh).run();
-    const { v } = await db.prepare("SELECT v FROM meta WHERE k = 'salt'").first();
+    ].map((sql) => db.prepare(sql)).concat(
+      Object.entries(SEED).map(([k, n]) =>
+        db.prepare('INSERT INTO counters (key, n) VALUES (?, ?) ON CONFLICT(key) DO NOTHING').bind(k, n)),
+      db.prepare("INSERT INTO meta (k, v) VALUES ('salt', ?) ON CONFLICT(k) DO NOTHING").bind(fresh),
+      db.prepare("SELECT v FROM meta WHERE k = 'salt'"),
+    ));
+    const { v } = res.at(-1).results[0];
     return crypto.subtle.importKey('raw', new TextEncoder().encode(v), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   })().catch((e) => { ready = undefined; throw e; }));
 
@@ -112,45 +115,59 @@ async function hitQuota(db, key, who, step) {
   return { key, n: await bump(db, key, allow), counted: allow, left: cap - took.used };
 }
 
+// Every vote response carries the whole tally, so the page doesn't need a second request to redraw.
+const tally = (db) =>
+  db.prepare(`SELECT key, n FROM counters WHERE key IN (${[...VOTE].map(() => '?').join(',')})`).bind(...VOTE);
+const tallyOf = ({ results }) => Object.fromEntries(results.map((r) => [r.key, r.n]));
+
 async function hitVote(db, key, browser, ip) {
   // Claim this browser's ballot first, then a slot from its IP's allowance; give the ballot back if the IP is full.
   const claimed = await db
     .prepare("INSERT INTO visitors (grp, who, key) VALUES ('vote', ?, ?) ON CONFLICT(grp, who) DO NOTHING RETURNING who")
     .bind(browser, key).first();
   if (!claimed) {
-    const prev = await db.prepare("SELECT key, n FROM visitors WHERE grp = 'vote' AND who = ?").bind(browser).first();
+    const [prev, all] = await db.batch([
+      db.prepare("SELECT key, n FROM visitors WHERE grp = 'vote' AND who = ?").bind(browser),
+      tally(db),
+    ]);
+    const p = prev.results[0];
     // No row means a concurrent request from this browser just gave its ballot back because the IP was full.
-    return prev ? { key: prev.key, n: prev.n, dup: true } : { key, full: true };
+    return p ? { key: p.key, n: p.n, dup: true, counts: tallyOf(all) } : { key, full: true };
   }
-  await db.prepare("INSERT INTO quota (grp, who) VALUES ('vote_ip', ?) ON CONFLICT(grp, who) DO NOTHING").bind(ip).run();
-  const took = await db
-    .prepare("UPDATE quota SET used = used + 1 WHERE grp = 'vote_ip' AND who = ? AND used < ? RETURNING used")
-    .bind(ip, VOTES_PER_IP).first();
-  if (!took) {
+  const [, took] = await db.batch([
+    db.prepare("INSERT INTO quota (grp, who) VALUES ('vote_ip', ?) ON CONFLICT(grp, who) DO NOTHING").bind(ip),
+    db.prepare("UPDATE quota SET used = used + 1 WHERE grp = 'vote_ip' AND who = ? AND used < ? RETURNING used")
+      .bind(ip, VOTES_PER_IP),
+  ]);
+  if (!took.results.length) {
     await db.prepare("DELETE FROM visitors WHERE grp = 'vote' AND who = ?").bind(browser).run();
     return { key, full: true };
   }
-  const n = await bump(db, key, 1);
-  await db.prepare("UPDATE visitors SET n = ? WHERE grp = 'vote' AND who = ?").bind(n, browser).run();
-  return { key, n, dup: false };
+  const [bumped, , all] = await db.batch([
+    db.prepare('INSERT INTO counters (key, n) VALUES (?, 1) ON CONFLICT(key) DO UPDATE SET n = n + 1 RETURNING n').bind(key),
+    db.prepare("UPDATE visitors SET n = (SELECT n FROM counters WHERE key = ?) WHERE grp = 'vote' AND who = ?").bind(key, browser),
+    tally(db),
+  ]);
+  return { key, n: bumped.results[0].n, dup: false, counts: tallyOf(all) };
 }
 
 export async function handleCounter(request, env, url) {
-  const salt = await init(env.DB);
-
   if (request.method === 'GET' && url.pathname === '/api/counts') {
     const keys = (url.searchParams.get('keys') || '').split(',').filter((k) => KEYS.has(k));
     if (!keys.length) return json({ error: 'unknown key' }, 400);
-    const { results } = await env.DB
+    // Reads don't need the salt, so skip setup unless the tables are missing (a fresh database).
+    const read = () => env.DB
       .prepare(`SELECT key, n FROM counters WHERE key IN (${keys.map(() => '?').join(',')})`)
       .bind(...keys)
       .all();
+    const { results } = await read().catch(() => init(env.DB).then(read));
     const out = Object.fromEntries(keys.map((k) => [k, 0]));
     for (const r of results) out[r.key] = r.n;
     return json(out);
   }
 
   if (request.method === 'POST' && url.pathname === '/api/hit') {
+    const salt = await init(env.DB);
     let body;
     try { body = JSON.parse(await request.text()); } catch { return json({ error: 'bad json' }, 400); }
     const key = body && body.key;

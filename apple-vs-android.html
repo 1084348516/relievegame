@@ -304,11 +304,15 @@
   const save = v => { try { localStorage.setItem(STORE, JSON.stringify(v)); } catch {} };
   const me = load();
 
-  let counts = Object.fromEntries(KEYS.map(k => [k, 0]));
+  // The last tally this browser saw, drawn instantly on the next visit while the fresh one loads.
+  const CACHE = 'rgvote_counts';
+  const cached = (() => { try { return JSON.parse(localStorage.getItem(CACHE)); } catch { return null; } })();
+  const keep = c => { try { localStorage.setItem(CACHE, JSON.stringify(c)); } catch {} };
+  let counts = { ...Object.fromEntries(KEYS.map(k => [k, 0])), ...cached };
   const shown = { apple: 0, android: 0 };
 
   /* ---------------- render ---------------- */
-  function tween(el, from, to, ms = 1100) {
+  function tween(el, from, to, ms = 700) {
     const t0 = performance.now();
     const step = now => {
       const k = Math.min((now - t0) / ms, 1);
@@ -398,27 +402,35 @@
     }
   }
 
+  // Optimistic: count the vote and celebrate right away, then settle on what the server says.
   async function vote(key, from) {
     if (me.key) return;
-    $('pickApple').disabled = $('pickAndroid').disabled = true;
+    const before = counts;
+    me.key = key;
+    counts = { ...counts, [key]: counts[key] + 1 };
+    burst(from, key === APPLE ? getComputedStyle(document.documentElement).getPropertyValue('--apple') : BRANDS.find(b => b.key === key).c);
+    render();
+    $('result').classList.remove('show'); void $('result').offsetWidth; $('result').classList.add('show');
+    const undo = msg => {
+      me.key = undefined;
+      counts = before;
+      $('pickApple').classList.remove('mine', 'dim');
+      $('pickAndroid').classList.remove('mine', 'dim');
+      $('pickApple').disabled = $('pickAndroid').disabled = false;
+      $('result').textContent = '';
+      render();
+      toast(msg);
+    };
     try {
       const r = await hit(key);
-      if (r.full) {
-        $('pickApple').disabled = $('pickAndroid').disabled = false;
-        return toast(t().full);
-      }
+      if (r.full) return undo(t().full);
       me.key = r.key; me.n = r.n;
       save(me);
       if (r.dup) toast(t().dup);
-      else {
-        burst(from, key === APPLE ? getComputedStyle(document.documentElement).getPropertyValue('--apple') : BRANDS.find(b => b.key === key).c);
-        $('result').classList.remove('show'); void $('result').offsetWidth; $('result').classList.add('show');
-      }
-      counts = await fetchCounts().catch(() => ({ ...counts, [r.key]: r.n }));
+      if (r.counts) { counts = { ...counts, ...r.counts }; keep(counts); }
       render();
     } catch {
-      $('pickApple').disabled = $('pickAndroid').disabled = false;
-      toast(t().fail);
+      undo(t().fail);
     }
   }
 
@@ -455,10 +467,10 @@
   };
 
   /* ---------------- start ---------------- */
-  let loaded = false;
+  let loaded = !!cached;
   applyLang();
   fetchCounts()
-    .then(c => { counts = c; loaded = true; render(); })
+    .then(c => { counts = c; keep(c); loaded = true; render(); })
     .catch(() => toast(t().loadFail));
 })();
 </script>
