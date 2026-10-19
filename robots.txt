@@ -16,3 +16,6 @@ Allow: /
 
 User-agent: Baiduspider
 Allow: /
+
+User-agent: Sogou web spider
+Allow: /

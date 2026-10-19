@@ -65,6 +65,8 @@ function page(lang, memes) {
 <title>${esc(t.title)}</title>
 <meta name="description" content="${esc(t.description)}">
 <meta name="robots" content="index, follow">
+<meta name="sogou_site_verification" content="TSckxJcYt2">
+<meta name="baidu-site-verification" content="codeva-bRO7CZVj6H">
 <link rel="canonical" href="${SITE}${t.path}">
 <link rel="alternate" hreflang="zh" href="${SITE}/">
 <link rel="alternate" hreflang="en" href="${SITE}/en/">
