@@ -28,13 +28,14 @@
   <h2>我们收集的数据</h2>
   <ul>
     <li><b>页面计数：</b>部分页面会显示访问人数、按钮点击次数等全站统计（比如疯狂星期四页面的“全网已收到”）。为了防止刷新刷数，服务器会把你的 IP 地址和一个随机密钥一起做单向哈希，只保存哈希结果，用来判断“同一个访客是否已经计过数”。<b>原始 IP 地址不会被保存</b>，哈希结果也无法还原成 IP。</li>
+    <li><b>投票 Cookie：</b>在投票页面投票时，本站会设置一个名为 <code>vid</code> 的 Cookie，里面只是一串随机编号，用来记住"这个浏览器已经投过票"，有效期两年。它不包含任何个人信息。</li>
     <li><b>语言偏好 Cookie：</b>如果你在首页点了中文 / English 切换按钮，本站会设置一个名为 <code>lang</code> 的 Cookie，记住你的选择，有效期一年。它不包含任何个人信息。</li>
     <li><b>浏览器本地存储：</b>部分互动页面（例如 91 页面）会在你的浏览器 localStorage 里记住你上次的结果，这些数据只存在你自己的设备上，不会上传。</li>
   </ul>
 
   <h2>第三方服务</h2>
   <ul>
-    <li><b>Cloudflare：</b>本站托管在 Cloudflare 上。和所有网站服务器一样，Cloudflare 会在处理请求时接触到你的 IP 地址、浏览器类型等访问信息，用于提供服务和防御攻击。详见 <a href="https://www.cloudflare.com/privacypolicy/" rel="nofollow">Cloudflare 隐私政策</a>。</li>
+    <li><b>网站托管：</b>本站托管在第三方云服务商上。和所有网站一样，服务商在处理请求时会接触到你的 IP 地址、浏览器类型等访问信息，仅用于提供服务和防御攻击。</li>
     <li><b>Google Fonts：</b>部分页面从 Google Fonts 加载字体，你的浏览器会因此向 Google 发送请求。详见 <a href="https://policies.google.com/privacy" rel="nofollow">Google 隐私权政策</a>。</li>
   </ul>
 
@@ -58,7 +59,7 @@
 
   <h2 lang="en">English summary</h2>
   <div lang="en">
-    <p>LOLgeng (www.lolgeng.com) requires no account and asks for no personal information. Page counters store only a salted one-way hash of your IP address, never the IP itself, to stop refresh-spamming. A <code>lang</code> cookie remembers your language choice, and some pages keep results in your browser's localStorage. The site is hosted on Cloudflare and some pages load Google Fonts.</p>
+    <p>LOLgeng (www.lolgeng.com) requires no account and asks for no personal information. Page counters store only a salted one-way hash of your IP address, never the IP itself, to stop refresh-spamming. A <code>lang</code> cookie remembers your language choice, a random <code>vid</code> cookie marks that a browser has already voted in a poll, and some pages keep results in your browser's localStorage. The site is hosted by a third-party cloud provider and some pages load Google Fonts.</p>
     <p>The site may show ads through Google AdSense. Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this and other websites. Google's use of advertising cookies enables it and its partners to serve ads based on your visits to this and/or other sites on the Internet. You can opt out of personalized advertising at <a href="https://adssettings.google.com" rel="nofollow">Google Ads Settings</a> or <a href="https://www.aboutads.info" rel="nofollow">www.aboutads.info</a>.</p>
     <p>Questions or data requests: <a href="mailto:ghdbright@gmail.com">ghdbright@gmail.com</a>.</p>
   </div>

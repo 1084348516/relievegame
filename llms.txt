@@ -8,6 +8,8 @@
 - [疯狂星期四文案大全](https://www.lolgeng.com/event/wenan): 100+ original Crazy Thursday "V me 50" copy lines in Chinese, grouped by style (identity twist, romance, fake science, classical, CEO romance, official notice, office worker, one-liners, comebacks), each with a copy button.
 - [91 · 老色批鉴定](https://www.lolgeng.com/91): Prank page for people searching "91" (slang for an adult site): instead of anything adult, it shows a cartoon portrait of a "老色批" (old perv) with a certification stamp. No adult content.
 
+- [苹果人 vs 安卓人 Apple vs Android](https://www.lolgeng.com/apple-vs-android): Live poll asking visitors whether they are "Apple people" (iPhone) or "Android people"; Android voters pick their phone brand (Huawei, Xiaomi, OPPO, vivo, Honor, Samsung, OnePlus, other). One vote per browser, a few per network; Chinese and English.
+
 ## Site
 
 - [About](https://www.lolgeng.com/about): What the site is and what each meme page contains.

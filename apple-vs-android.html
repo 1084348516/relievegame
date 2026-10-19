@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>苹果人 vs 安卓人</title>
+<meta name="description" content="你是苹果人还是安卓人？投一票看看全网站队情况，安卓人还能选自己用的手机品牌：华为、小米、OPPO、vivo、荣耀……">
+<link rel="canonical" href="https://www.lolgeng.com/apple-vs-android">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.lolgeng.com/apple-vs-android">
+<meta property="og:title" content="苹果人 vs 安卓人">
+<meta property="og:description" content="你站哪边？投一票看看全网站队情况。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%231d1d1f'/><rect x='32' width='32' height='64' fill='%233ddc84'/><text x='32' y='42' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='22' font-weight='900' fill='%23fff'>VS</text></svg>">
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --card: #ffffff;
+    --ink: #1d1d1f;
+    --muted: #86868b;
+    --line: #e5e5ea;
+    --apple: #1d1d1f;
+    --android: #3ddc84;
+    --android-ink: #12a150;
+    --ease: cubic-bezier(.2, .8, .2, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0d;
+      --card: #17171a;
+      --ink: #f5f5f7;
+      --muted: #8e8e93;
+      --line: #2a2a2e;
+      --apple: #f5f5f7;
+      --android-ink: #3ddc84;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  .wrap { position: relative; max-width: 640px; margin: 0 auto; padding: 32px 16px 48px; }
+  .lang {
+    position: absolute; top: 24px; right: 16px;
+    font: inherit; font-size: 13px; color: var(--muted); background: none; cursor: pointer;
+    border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px;
+  }
+  .lang:hover { color: var(--ink); border-color: var(--ink); }
+  h1 { margin: 16px 0 4px; font-size: clamp(30px, 8vw, 44px); letter-spacing: -.02em; line-height: 1.15; }
+  h1 .vs { color: var(--muted); font-weight: 400; font-size: .6em; margin: 0 .2em; vertical-align: .15em; }
+  h1 .a { color: var(--android-ink); }
+
+  /* entrance */
+  .rise { opacity: 0; transform: translateY(16px); animation: rise .7s var(--ease) forwards; animation-delay: calc(var(--i, 0) * 90ms); }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+
+  /* scoreboard */
+  .board { margin-top: 28px; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px; }
+  .nums { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+  .side .label { font-size: 13px; color: var(--muted); }
+  .side .count { font-size: 30px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; line-height: 1.2; }
+  .side .count small { font-size: 14px; font-weight: 500; color: var(--muted); margin-left: 4px; }
+  .side.r { text-align: right; }
+  .side.r .count { color: var(--android-ink); }
+  .split { position: relative; display: flex; height: 14px; margin-top: 14px; border-radius: 999px; overflow: hidden; background: var(--line); }
+  .split i { display: block; height: 100%; width: 50%; transition: width 1.2s var(--ease); }
+  .split .pa { background: var(--apple); }
+  .split .pn { background: var(--android); }
+  .split::after { /* moving sheen */
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%);
+    transform: translateX(-100%); animation: sheen 3.2s 1.4s ease-in-out infinite;
+  }
+  @keyframes sheen { 60%, 100% { transform: translateX(100%); } }
+  .pct { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  /* choice cards */
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .choice {
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    padding: 24px 12px 20px;
+    background: var(--card); color: inherit; font: inherit; text-align: center;
+    border: 1.5px solid var(--line); border-radius: 20px; cursor: pointer;
+    transition: transform .25s var(--ease), border-color .25s, box-shadow .25s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .choice:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 12px 32px -12px rgba(0,0,0,.18); }
+  .choice:active:not(:disabled) { transform: scale(.97); }
+  .choice.apple:hover:not(:disabled) { border-color: var(--apple); }
+  .choice.android:hover:not(:disabled) { border-color: var(--android); }
+  .choice:disabled { cursor: default; }
+  .choice.dim { opacity: .45; }
+  .choice.mine.apple { border-color: var(--apple); }
+  .choice.mine.android { border-color: var(--android); }
+  .choice .phone { width: 64px; height: 112px; animation: float 4s ease-in-out infinite; }
+  .choice.android .phone { animation-delay: -2s; }
+  @keyframes float { 50% { transform: translateY(-6px) rotate(-2deg); } }
+  .choice .name { font-size: 20px; font-weight: 700; }
+  .choice .hint { font-size: 13px; color: var(--muted); margin-top: -8px; }
+  .badge {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+    background: var(--ink); color: var(--bg);
+    transform: scale(0); transition: transform .4s var(--ease);
+  }
+  .choice.android .badge { background: var(--android); color: #06210f; }
+  .choice.mine .badge { transform: scale(1); }
+
+  /* result line */
+  .result { margin: 16px 0 0; min-height: 1.5em; text-align: center; font-size: 15px; }
+  .result b { font-variant-numeric: tabular-nums; }
+  .result.show { animation: rise .6s var(--ease); }
+
+  /* android breakdown */
+  .brands { margin-top: 28px; }
+  .brands h2 { margin: 0 0 12px; font-size: 16px; }
+  .brands h2 #brandTotal { color: var(--muted); font-weight: 400; font-size: 13px; margin-left: 6px; }
+  .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .row { display: grid; grid-template-columns: 68px 1fr 64px; align-items: center; gap: 10px; font-size: 14px; }
+  .row .bar { height: 10px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .row .bar i { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--c); transition: width 1.1s var(--ease); }
+  .row .n { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .row.mine { font-weight: 700; }
+  .row.mine .n { color: var(--ink); }
+
+  /* brand picker sheet */
+  .sheet-bg {
+    position: fixed; inset: 0; z-index: 10;
+    background: rgba(0,0,0,.35); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    opacity: 0; pointer-events: none; transition: opacity .3s;
+  }
+  .sheet {
+    position: fixed; left: 50%; bottom: 0; z-index: 11;
+    width: min(100%, 520px); padding: 12px 20px calc(24px + env(safe-area-inset-bottom));
+    background: var(--card); border-radius: 24px 24px 0 0;
+    transform: translate(-50%, 105%); transition: transform .45s var(--ease);
+  }
+  .open .sheet-bg { opacity: 1; pointer-events: auto; }
+  .open .sheet { transform: translate(-50%, 0); }
+  .grip { width: 40px; height: 5px; border-radius: 999px; background: var(--line); margin: 0 auto 14px; }
+  .sheet h3 { margin: 0; font-size: 18px; }
+  .sheet p { margin: 2px 0 16px; color: var(--muted); font-size: 13px; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .brand {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 14px 4px; font: inherit; font-size: 14px; color: inherit;
+    background: var(--bg); border: 1.5px solid transparent; border-radius: 14px; cursor: pointer;
+    opacity: 0; transform: translateY(12px) scale(.96);
+    transition: border-color .2s, transform .2s var(--ease), opacity .2s;
+  }
+  .brand:hover { border-color: var(--c); }
+  .brand:active { transform: scale(.95); }
+  .brand .dot { width: 26px; height: 26px; border-radius: 50%; background: var(--c); box-shadow: inset 0 -3px 0 rgba(0,0,0,.15); }
+  .open .brand { animation: rise .45s var(--ease) forwards; animation-delay: calc(120ms + var(--i) * 35ms); }
+  .cancel {
+    display: block; width: 100%; margin-top: 14px; padding: 12px;
+    font: inherit; font-size: 15px; color: var(--muted);
+    background: none; border: 1px solid var(--line); border-radius: 14px; cursor: pointer;
+  }
+
+  /* burst particles */
+  .p {
+    position: fixed; z-index: 20; width: 8px; height: 8px; border-radius: 2px; pointer-events: none;
+    background: var(--c); animation: burst .9s var(--ease) forwards;
+  }
+  @keyframes burst {
+    to { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; }
+  }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; z-index: 30;
+    transform: translate(-50%, 20px); opacity: 0; transition: all .3s var(--ease);
+    background: var(--ink); color: var(--bg); padding: 8px 16px; border-radius: 999px; font-size: 14px;
+  }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+
+  @media (max-width: 380px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <button class="lang rise" id="lang" type="button" lang="en">EN</button>
+  <h1 class="rise"><span data-t="apple">苹果人</span><span class="vs">vs</span><span class="a" data-t="android">安卓人</span></h1>
+
+  <section class="board rise" style="--i:3">
+    <div class="nums">
+      <div class="side">
+        <div class="label" data-t="apple">苹果人</div>
+        <div class="count"><span id="nApple">0</span><small data-t="unit">人</small></div>
+      </div>
+      <div class="side r">
+        <div class="label" data-t="android">安卓人</div>
+        <div class="count"><span id="nAndroid">0</span><small data-t="unit">人</small></div>
+      </div>
+    </div>
+    <div class="split"><i class="pa" id="barApple"></i><i class="pn" id="barAndroid"></i></div>
+    <div class="pct"><span id="pApple">50%</span><span id="pAndroid">50%</span></div>
+  </section>
+
+  <div class="choices rise" style="--i:4">
+    <button class="choice apple" id="pickApple" type="button">
+      <span class="badge" data-t="mine">我的</span>
+      <svg class="phone" viewBox="0 0 64 112" aria-hidden="true">
+        <defs><linearGradient id="wa" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a18cd1"/><stop offset="1" stop-color="#5b8def"/></linearGradient></defs>
+        <rect x="2" y="2" width="60" height="108" rx="14" fill="#1d1d1f"/>
+        <rect x="5" y="5" width="54" height="102" rx="11" fill="url(#wa)"/>
+        <rect x="22" y="9" width="20" height="6" rx="3" fill="#1d1d1f"/>
+        <rect x="24" y="100" width="16" height="2.5" rx="1.25" fill="#fff" opacity=".8"/>
+      </svg>
+      <span class="name" data-t="apple">苹果人</span>
+      <span class="hint" data-t="appleHint">我用 iPhone</span>
+    </button>
+    <button class="choice android" id="pickAndroid" type="button">
+      <span class="badge" data-t="mine">我的</span>
+      <svg class="phone" viewBox="0 0 64 112" aria-hidden="true">
+        <defs><linearGradient id="wn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3ddc84"/><stop offset="1" stop-color="#0fa3b1"/></linearGradient></defs>
+        <rect x="2" y="2" width="60" height="108" rx="10" fill="#2b2b2f"/>
+        <rect x="5" y="5" width="54" height="102" rx="7" fill="url(#wn)"/>
+        <circle cx="32" cy="12" r="3" fill="#2b2b2f"/>
+        <g fill="#fff" opacity=".85"><circle cx="22" cy="100" r="2"/><circle cx="32" cy="100" r="2"/><circle cx="42" cy="100" r="2"/></g>
+      </svg>
+      <span class="name" data-t="android">安卓人</span>
+      <span class="hint" data-t="androidHint">我用安卓手机</span>
+    </button>
+  </div>
+  <p class="result" id="result" aria-live="polite"></p>
+
+  <section class="brands rise" style="--i:5">
+    <h2><span data-t="brandsTitle">安卓人都用什么</span><span id="brandTotal"></span></h2>
+    <ul class="rows" id="rows"></ul>
+  </section>
+</main>
+
+<div id="picker">
+  <div class="sheet-bg" id="sheetBg"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="grip"></div>
+    <h3 id="sheetTitle" data-t="sheetTitle">你用的是哪家安卓？</h3>
+    <p data-t="sheetHint">选好就算投票，只能投一次哦。</p>
+    <div class="grid" id="grid"></div>
+    <button class="cancel" id="cancel" type="button" data-t="cancel">再想想</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  // /apple-vs-android. Votes are counters in the site Worker (src/counter.js): one ballot per browser, a few per IP.
+  const API = '/api';
+  const STORE = 'rgvote';
+  const BRANDS = [
+    { key: 'vote_huawei', zh: '华为', en: 'Huawei', c: '#cf0a2c' },
+    { key: 'vote_xiaomi', zh: '小米', en: 'Xiaomi', c: '#ff6900' },
+    { key: 'vote_oppo', zh: 'OPPO', en: 'OPPO', c: '#0a8f4f' },
+    { key: 'vote_vivo', zh: 'vivo', en: 'vivo', c: '#415fff' },
+    { key: 'vote_honor', zh: '荣耀', en: 'Honor', c: '#00a6e6' },
+    { key: 'vote_samsung', zh: '三星', en: 'Samsung', c: '#1428a0' },
+    { key: 'vote_oneplus', zh: '一加', en: 'OnePlus', c: '#eb0029' },
+    { key: 'vote_other', zh: '其他', en: 'Other', c: '#9aa0a6' },
+  ];
+  const APPLE = 'vote_apple';
+  const KEYS = [APPLE, ...BRANDS.map(b => b.key)];
+  const $ = id => document.getElementById(id);
+
+  /* ---------------- language ---------------- */
+  // Shares the homepage's `lang` cookie. Without one, follow the browser — except crawlers, which get Chinese.
+  const T = {
+    zh: {
+      title: '苹果人 vs 安卓人', apple: '苹果人', android: '安卓人', unit: '人',
+      appleHint: '我用 iPhone', androidHint: '我用安卓手机', mine: '我的',
+      brandsTitle: '安卓人都用什么', brandTotal: n => `共 ${n} 人`,
+      sheetTitle: '你用的是哪家安卓？', sheetHint: '选好就算投票，只能投一次哦。', cancel: '再想想',
+      label: b => b ? `${b.zh}安卓人` : '苹果人',
+      result: (label, n) => n ? `你是第 <b>${n}</b> 位${label}` : `你投给了${label}`,
+      dup: '你已经投过票了', full: '这个网络投票的人太多了，换个网络试试',
+      fail: '投票失败，稍后再试', loadFail: '票数加载失败', switchTo: 'EN',
+    },
+    en: {
+      title: 'Team Apple vs Team Android', apple: 'Team Apple', android: 'Team Android', unit: 'people',
+      appleHint: 'I use an iPhone', androidHint: 'I use Android', mine: 'Mine',
+      brandsTitle: 'What Team Android uses', brandTotal: n => `${n} total`,
+      sheetTitle: 'Which Android brand?', sheetHint: 'Picking one casts your vote — you only get one.', cancel: 'Not yet',
+      label: b => b ? `${b.en} Team Android` : 'Team Apple',
+      result: (label, n) => n ? `You're <b>#${n}</b> on ${label}` : `You voted ${label}`,
+      dup: "You've already voted", full: 'Too many votes from this network — try another one',
+      fail: 'Vote failed, try again later', loadFail: "Couldn't load the votes", switchTo: '中文',
+    },
+  };
+  const cookieLang = (document.cookie.match(/(?:^|;\s*)lang=(zh|en)\b/) || [])[1];
+  const bot = /bot|crawl|spider|slurp/i.test(navigator.userAgent);
+  let L = cookieLang || (!bot && !/^zh/i.test(navigator.language || '') ? 'en' : 'zh');
+  const t = () => T[L];
+
+  const load = () => { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; } };
+  const save = v => { try { localStorage.setItem(STORE, JSON.stringify(v)); } catch {} };
+  const me = load();
+
+  let counts = Object.fromEntries(KEYS.map(k => [k, 0]));
+  const shown = { apple: 0, android: 0 };
+
+  /* ---------------- render ---------------- */
+  function tween(el, from, to, ms = 1100) {
+    const t0 = performance.now();
+    const step = now => {
+      const k = Math.min((now - t0) / ms, 1);
+      const e = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(from + (to - from) * e).toLocaleString();
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  function render() {
+    const apple = counts[APPLE];
+    const android = BRANDS.reduce((s, b) => s + counts[b.key], 0);
+    const total = apple + android || 1;
+    const pa = Math.round(apple / total * 1000) / 10;
+    tween($('nApple'), shown.apple, apple);
+    tween($('nAndroid'), shown.android, android);
+    shown.apple = apple; shown.android = android;
+    $('barApple').style.width = pa + '%';
+    $('barAndroid').style.width = (100 - pa) + '%';
+    $('pApple').textContent = pa.toFixed(1) + '%';
+    $('pAndroid').textContent = (100 - pa).toFixed(1) + '%';
+
+    $('brandTotal').textContent = t().brandTotal(android.toLocaleString());
+    const max = Math.max(...BRANDS.map(b => counts[b.key]), 1);
+    const sorted = [...BRANDS].sort((a, b) => counts[b.key] - counts[a.key]);
+    const rows = $('rows');
+    // Reuse rows so bar widths animate from their previous value.
+    sorted.forEach((b, i) => {
+      let li = rows.querySelector(`[data-k="${b.key}"]`);
+      if (!li) {
+        li = document.createElement('li');
+        li.className = 'row';
+        li.dataset.k = b.key;
+        li.style.setProperty('--c', b.c);
+        li.innerHTML = `<span></span><span class="bar"><i></i></span><span class="n"></span>`;
+      }
+      rows.appendChild(li);
+      li.firstChild.textContent = b[L];
+      li.classList.toggle('mine', me.key === b.key);
+      const n = counts[b.key];
+      li.querySelector('.n').textContent = `${n} · ${Math.round(n / (android || 1) * 100)}%`;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        li.querySelector('.bar i').style.width = (n / max * 100) + '%';
+      }));
+    });
+
+    markMine();
+  }
+
+  function markMine() {
+    if (!me.key) return;
+    const isApple = me.key === APPLE;
+    $('pickApple').classList.toggle('mine', isApple);
+    $('pickAndroid').classList.toggle('mine', !isApple);
+    $('pickApple').classList.toggle('dim', !isApple);
+    $('pickAndroid').classList.toggle('dim', isApple);
+    $('pickApple').disabled = $('pickAndroid').disabled = true;
+    const label = t().label(isApple ? null : BRANDS.find(b => b.key === me.key));
+    $('result').innerHTML = t().result(label, me.n && me.n.toLocaleString());
+  }
+
+  /* ---------------- api ---------------- */
+  const fetchCounts = () => fetch(`${API}/counts?keys=${KEYS.join(',')}`)
+    .then(r => r.ok ? r.json() : Promise.reject(r.status));
+  const hit = key => fetch(`${API}/hit`, { method: 'POST', body: JSON.stringify({ key }) })
+    .then(r => r.ok ? r.json() : Promise.reject(r.status));
+
+  function toast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toast.t);
+    toast.t = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function burst(el, color) {
+    const r = el.getBoundingClientRect();
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement('i');
+      p.className = 'p';
+      const a = Math.random() * Math.PI * 2, d = 60 + Math.random() * 90;
+      p.style.cssText = `left:${cx}px;top:${cy}px;--c:${color};--x:${Math.cos(a) * d}px;--y:${Math.sin(a) * d}px;--r:${Math.random() * 540}deg`;
+      document.body.appendChild(p);
+      p.addEventListener('animationend', () => p.remove());
+    }
+  }
+
+  async function vote(key, from) {
+    if (me.key) return;
+    $('pickApple').disabled = $('pickAndroid').disabled = true;
+    try {
+      const r = await hit(key);
+      if (r.full) {
+        $('pickApple').disabled = $('pickAndroid').disabled = false;
+        return toast(t().full);
+      }
+      me.key = r.key; me.n = r.n;
+      save(me);
+      if (r.dup) toast(t().dup);
+      else {
+        burst(from, key === APPLE ? getComputedStyle(document.documentElement).getPropertyValue('--apple') : BRANDS.find(b => b.key === key).c);
+        $('result').classList.remove('show'); void $('result').offsetWidth; $('result').classList.add('show');
+      }
+      counts = await fetchCounts().catch(() => ({ ...counts, [r.key]: r.n }));
+      render();
+    } catch {
+      $('pickApple').disabled = $('pickAndroid').disabled = false;
+      toast(t().fail);
+    }
+  }
+
+  /* ---------------- brand picker ---------------- */
+  const picker = $('picker');
+  const openPicker = () => picker.classList.add('open');
+  const closePicker = () => picker.classList.remove('open');
+  $('grid').addEventListener('click', e => {
+    const btn = e.target.closest('.brand');
+    if (!btn) return;
+    closePicker();
+    vote(btn.dataset.k, $('pickAndroid'));
+  });
+  $('sheetBg').onclick = $('cancel').onclick = closePicker;
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePicker(); });
+
+  $('pickApple').onclick = () => vote(APPLE, $('pickApple'));
+  $('pickAndroid').onclick = openPicker;
+
+  function applyLang() {
+    document.documentElement.lang = L === 'en' ? 'en' : 'zh-CN';
+    document.title = t().title;
+    document.querySelectorAll('[data-t]').forEach(el => { el.textContent = t()[el.dataset.t]; });
+    $('lang').textContent = t().switchTo;
+    $('lang').lang = L === 'en' ? 'zh-CN' : 'en';
+    $('grid').innerHTML = BRANDS.map((b, i) =>
+      `<button class="brand" type="button" data-k="${b.key}" style="--c:${b.c};--i:${i}"><span class="dot"></span>${b[L]}</button>`).join('');
+    if (loaded) render(); else markMine();
+  }
+  $('lang').onclick = () => {
+    L = L === 'en' ? 'zh' : 'en';
+    document.cookie = `lang=${L}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+    applyLang();
+  };
+
+  /* ---------------- start ---------------- */
+  let loaded = false;
+  applyLang();
+  fetchCounts()
+    .then(c => { counts = c; loaded = true; render(); })
+    .catch(() => toast(t().loadFail));
+})();
+</script>
+</body>
+</html>

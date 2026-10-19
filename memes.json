@@ -1,5 +1,19 @@
 [
   {
+    "url": "/apple-vs-android",
+    "emoji": "📱",
+    "zh": {
+      "name": "苹果人 vs 安卓人",
+      "desc": "你站哪边？投一票看全网站队，安卓人还能选自己的手机品牌。",
+      "tag": "投票"
+    },
+    "en": {
+      "name": "Apple vs Android",
+      "desc": "iPhone people or Android people? Cast your vote and see who's winning.",
+      "tag": "Poll"
+    }
+  },
+  {
     "url": "/91",
     "emoji": "😏",
     "zh": {

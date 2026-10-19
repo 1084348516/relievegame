@@ -6,6 +6,24 @@
 // Anti-refresh: visitors are identified by a salted hash of their IP (the raw IP is never stored).
 //   - "once" keys count each IP a single time per group; a repeat returns that IP's original number.
 //   - "quota" keys count at most `cap` steps per IP per day (China time); extra clicks are ignored.
+//   - "vote" keys allow one ballot per browser (random `vid` cookie) and at most VOTES_PER_IP ballots per IP,
+//     so people sharing a network can each vote while cookie-clearing can't stuff the box.
+
+// Apple vs Android vote (/apple-vs-android): one ballot across all of these; Android total = sum of the brands.
+// SEED is the starting tally, written once when the row doesn't exist yet (258 Apple vs 126 Android).
+const SEED = {
+  vote_apple: 258,
+  vote_huawei: 42,
+  vote_xiaomi: 31,
+  vote_oppo: 18,
+  vote_vivo: 15,
+  vote_honor: 11,
+  vote_samsung: 5,
+  vote_oneplus: 2,
+  vote_other: 2,
+};
+const VOTE = new Set(Object.keys(SEED));
+const VOTES_PER_IP = 5;
 
 const ONCE = {
   '91_visit': '91_visit',
@@ -14,7 +32,7 @@ const ONCE = {
   event_visit: 'event_visit',
 };
 const QUOTA = { event_v50: 20 };
-const KEYS = new Set([...Object.keys(ONCE), ...Object.keys(QUOTA)]);
+const KEYS = new Set([...Object.keys(ONCE), ...Object.keys(QUOTA), ...VOTE]);
 const MAX_STEP = 20;
 
 // Create tables and the hashing salt on first use, so a fresh database needs no manual setup.
@@ -27,22 +45,35 @@ const init = (db) =>
       'CREATE TABLE IF NOT EXISTS quota (grp TEXT NOT NULL, who TEXT NOT NULL, used INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (grp, who))',
       'CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT NOT NULL)',
     ]) await db.prepare(sql).run();
+    await db.batch(Object.entries(SEED).map(([k, n]) =>
+      db.prepare('INSERT INTO counters (key, n) VALUES (?, ?) ON CONFLICT(key) DO NOTHING').bind(k, n)));
     const fresh = [...crypto.getRandomValues(new Uint8Array(32))].map((b) => b.toString(16).padStart(2, '0')).join('');
     await db.prepare("INSERT INTO meta (k, v) VALUES ('salt', ?) ON CONFLICT(k) DO NOTHING").bind(fresh).run();
     const { v } = await db.prepare("SELECT v FROM meta WHERE k = 'salt'").first();
     return crypto.subtle.importKey('raw', new TextEncoder().encode(v), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   })().catch((e) => { ready = undefined; throw e; }));
 
-async function visitorId(request, key) {
-  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(ip));
+// An IPv6 user usually owns a whole /64 and can rotate addresses inside it, so the /64 counts as one visitor.
+const voter = (ip) => {
+  if (!ip.includes(':')) return ip;
+  const [head, tail = ''] = ip.toLowerCase().split('::');
+  const h = head ? head.split(':') : [];
+  const t = tail ? tail.split(':') : [];
+  const full = ip.includes('::') ? [...h, ...Array(8 - h.length - t.length).fill('0'), ...t] : h;
+  return full.slice(0, 4).map((g) => g.replace(/^0+(?=.)/, '')).join(':') + '::/64';
+};
+
+async function digest(key, text) {
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(text));
   return [...new Uint8Array(sig, 0, 16)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-const json = (data, status = 200) =>
+const visitorId = (request, key) => digest(key, voter(request.headers.get('CF-Connecting-IP') || 'unknown'));
+
+const json = (data, status = 200, headers = {}) =>
   new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', ...headers },
   });
 
 const bump = (db, key, step) =>
@@ -81,6 +112,29 @@ async function hitQuota(db, key, who, step) {
   return { key, n: await bump(db, key, allow), counted: allow, left: cap - took.used };
 }
 
+async function hitVote(db, key, browser, ip) {
+  // Claim this browser's ballot first, then a slot from its IP's allowance; give the ballot back if the IP is full.
+  const claimed = await db
+    .prepare("INSERT INTO visitors (grp, who, key) VALUES ('vote', ?, ?) ON CONFLICT(grp, who) DO NOTHING RETURNING who")
+    .bind(browser, key).first();
+  if (!claimed) {
+    const prev = await db.prepare("SELECT key, n FROM visitors WHERE grp = 'vote' AND who = ?").bind(browser).first();
+    // No row means a concurrent request from this browser just gave its ballot back because the IP was full.
+    return prev ? { key: prev.key, n: prev.n, dup: true } : { key, full: true };
+  }
+  await db.prepare("INSERT INTO quota (grp, who) VALUES ('vote_ip', ?) ON CONFLICT(grp, who) DO NOTHING").bind(ip).run();
+  const took = await db
+    .prepare("UPDATE quota SET used = used + 1 WHERE grp = 'vote_ip' AND who = ? AND used < ? RETURNING used")
+    .bind(ip, VOTES_PER_IP).first();
+  if (!took) {
+    await db.prepare("DELETE FROM visitors WHERE grp = 'vote' AND who = ?").bind(browser).run();
+    return { key, full: true };
+  }
+  const n = await bump(db, key, 1);
+  await db.prepare("UPDATE visitors SET n = ? WHERE grp = 'vote' AND who = ?").bind(n, browser).run();
+  return { key, n, dup: false };
+}
+
 export async function handleCounter(request, env, url) {
   const salt = await init(env.DB);
 
@@ -104,6 +158,12 @@ export async function handleCounter(request, env, url) {
     if (!KEYS.has(key)) return json({ error: 'unknown key' }, 400);
     if (step < 1 || step > MAX_STEP) return json({ error: 'bad n' }, 400);
     const who = await visitorId(request, salt);
+    if (VOTE.has(key)) {
+      const m = (request.headers.get('Cookie') || '').match(/(?:^|;\s*)vid=([0-9a-f]{32})\b/);
+      const vid = m ? m[1] : [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, '0')).join('');
+      const headers = m ? {} : { 'Set-Cookie': `vid=${vid}; Path=/api/; Max-Age=${60 * 60 * 24 * 365 * 2}; HttpOnly; SameSite=Lax; Secure` };
+      return json(await hitVote(env.DB, key, await digest(salt, `vid:${vid}`), who), 200, headers);
+    }
     return json(ONCE[key] ? await hitOnce(env.DB, key, who) : await hitQuota(env.DB, key, who, step));
   }
 

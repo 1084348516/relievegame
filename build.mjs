@@ -5,7 +5,7 @@ import { wenanPage } from './wenan.mjs';
 
 const SITE = 'https://www.lolgeng.com';
 // 9a1e2d9af5f8d39de4a56ab1d571997c.txt is the IndexNow key (Bing etc.); it must be served at the site root.
-const STATIC = ['9a1e2d9af5f8d39de4a56ab1d571997c.txt', 'event.html', '91.html', 'about.html', 'privacy.html', 'page.css', 'robots.txt', 'sitemap.xml', 'llms.txt', 'og'];
+const STATIC = ['9a1e2d9af5f8d39de4a56ab1d571997c.txt', 'event.html', '91.html', 'apple-vs-android.html', 'about.html', 'privacy.html', 'page.css', 'robots.txt', 'sitemap.xml', 'llms.txt', 'og'];
 
 const text = {
   zh: {
