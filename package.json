@@ -2,6 +2,7 @@
   "name": "relievegame",
   "private": true,
   "scripts": {
-    "build": "node build.mjs"
+    "build": "node build.mjs",
+    "baidu-push": "node baidu-push.mjs"
   }
 }
